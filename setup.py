@@ -5,4 +5,6 @@ setup(name='drunken-markov',
       description='Markov chain analysis / estimation pipeline',
       url='https://github.com/nebw/drunken-markov',
       packages=['drunkenmarkov'],
-      zip_safe=False)
+      zip_safe=False,
+      test_suite='nose.collector',
+      tests_require=['nose'])
