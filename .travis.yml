@@ -1,15 +1,28 @@
 language: python
+
 python:
-  - "2.7_with_system_site_packages"
+  - 2.7
   - 3.3
 
-# workaround for scipy..
-# install scipy with the default package manager, pip does not install the necessities
-before_install:
-  - sudo apt-get install -qq python-numpy python-scipy
+notifications:
+  email: false
 
-# for most pip-packages, the following approach should work:
-#install: pip install numpy --use-mirrors
+# Setup anaconda - adapted from https://gist.github.com/dan-blanchard/7045057
+# This is mainly to work around an issue when installing scipy via pip
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  - sudo rm -rf /dev/shm
+  - sudo ln -s /run/shm /dev/shm
+
+# Install packages
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose
+  - python setup.py install
 
 # command to run tests, e.g. python setup.py test
 script: python setup.py test
