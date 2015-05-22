@@ -2,6 +2,16 @@ language: python
 python:
   - "3.3"
   - "2.7"
-install: pip install numpy scipy --use-mirrors
+
+# workaround for scipy..
+# use system-wide packages and then just install scipy with the default package manager
+virtualenv:
+  system_site_packages: true
+before_install:
+  - sudo apt-get install -qq python-numpy python-scipy
+
+# for most pip-packages, the following approach should work:
+#install: pip install numpy scipy --use-mirrors
+
 # command to run tests, e.g. python setup.py test
 script: python setup.py test
