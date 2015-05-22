@@ -2,8 +2,6 @@
 from ..Clustering import Clusters
 
 import numpy as np
-# for intializing an initial configuration in the KMeans search
-import random
 # for speeding up lookups for assigning a center to a data point
 from scipy.spatial import KDTree
 
@@ -28,8 +26,8 @@ class KMeans(object):
 		cluster_map = [-1] * data_length
 		# start off with a few random cluster centers;
 		# this is the Forgy method and usually OK for standard k-means.
-		current_cluster_centers = np.array(random.sample(data, self.k))
-		
+		current_cluster_centers = data[np.random.choice(data_length, size=self.k, replace=False), :]
+
 		# repeat the loop until the cluster assignments do not change anymore
 		at_least_one_assignment_changed = True
 		
