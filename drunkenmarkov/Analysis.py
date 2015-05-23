@@ -39,7 +39,24 @@ class msm:
     def stationary_distribution(self):
         """
         Compute the stationary distribution for the Markov Chain
-        """    
+        """
+        ewp = np.linalg.eig(np.transpose(self.T))
+        eigenvalues = ewp[0]
+        eigenvectors = ewp[1]
+        # Index b des Eigenwertes 1 finden:
+        b = np.where(eigenvalues==1)
+        stat_dist = np.zeros(len(self.T[0, :]))
+        for i in range(0, len(self.T[0, :])):
+            # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
+            # und in die i-te Zeile der stationären Verteilung stat_dist
+            # schreiben
+            stat_dist[i] = eigenvectors[i][b]
+        # stationäre Verteilung normieren
+        stat_dist_norm = np.linalg.norm(stat_dist,1)
+        for i in range(0, len(self.T[0, :])):
+            stat_dist[i] /= stat_dist_norm
+        return stat_dist    
+
 
     @property
     def timescales(self):
