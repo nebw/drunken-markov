@@ -17,4 +17,4 @@ class StationaryTests(TestCase):
 
         markovmodel = msm(T)
         pi = markovmodel.stationary_distribution
-        self.assertEqual(pi*T, pi)
+        self.assertEqual((pi*T, pi).all())
