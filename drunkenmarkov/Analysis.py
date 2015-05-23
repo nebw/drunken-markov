@@ -51,7 +51,7 @@ class msm:
             # und in die i-te Zeile der stationaeren Verteilung stat_dist
             # schreiben
             stat_dist[i] = eigenvectors[i][b]
-        # stationäre Verteilung normieren
+        # stationaere Verteilung normieren
         stat_dist_norm = np.linalg.norm(stat_dist,1)
         for i in range(0, len(self.T[0, :])):
             stat_dist[i] /= stat_dist_norm
