@@ -16,4 +16,5 @@ class StationaryTests(TestCase):
         T = np.array([[0.9, 0.1, 0.0], [0.5, 0.0, 0.5], [0.0, 0.1, 0.9]])
 
         markovmodel = msm(T)
-        print markovmodel.stationary_distribution
+        pi = markovmodel.stationary_distribution
+        self.assertEqual(pi*self.T, pi)
