@@ -48,7 +48,7 @@ class msm:
         stat_dist = np.zeros(len(self.T[0, :]))
         for i in range(0, len(self.T[0, :])):
             # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
-            # und in die i-te Zeile der stationären Verteilung stat_dist
+            # und in die i-te Zeile der stationaeren Verteilung stat_dist
             # schreiben
             stat_dist[i] = eigenvectors[i][b]
         # stationäre Verteilung normieren
