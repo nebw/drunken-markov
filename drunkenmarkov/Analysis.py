@@ -14,6 +14,34 @@ class msm:
         self._timescales = None
 
     @property
+    def is_transition_matrix(self):
+        """
+        Check if the given matrix is a transition matrix (stochastic matrix)
+        """
+        tmatrix = True
+        for rowi in range(0, len(self.T[0, :])):
+            for coli in range(0, len(self.T[0, :])):
+                if self.T[rowi,coli] < 0:
+                    tmatrix = False
+            if self.T[rowi, :].sum() != 1:
+                tmatrix = False
+        if tmatrix == False:
+            print ('no stochastic matrix')
+        return tmatrix    
+
+    @property
+    def is_connected(self):
+        """
+        Check if the given matrix is connected (=irreducible)
+        """
+        
+    @property
+    def stationary_distribution(self):
+        """
+        Compute the stationary distribution for the Markov Chain
+        """    
+
+    @property
     def timescales(self):
         """
         Compute the time scales of a given transition matrix T.
