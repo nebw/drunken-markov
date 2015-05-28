@@ -2,7 +2,7 @@
 import copy
 import numpy as np
 
-from Util import get_adjacent_nodes, depth_first_search
+from .Util import get_adjacent_nodes, depth_first_search
 
 class MarkovStateModel:
     def __init__(self, T, lagtime=1.):
@@ -30,7 +30,7 @@ class MarkovStateModel:
                 tmatrix = False
         if tmatrix == False:
             print ('no stochastic matrix')
-        return tmatrix    
+        return tmatrix
 
     @property
     def is_connected(self):
@@ -95,45 +95,45 @@ class MarkovStateModel:
 
     @property
     def communication_classes(self):
-        """Linear time algorithm to find the strongly connected components of 
+        """Linear time algorithm to find the strongly connected components of
         a directed graph.
-        
+
         Pseudocode: http://en.wikipedia.org/wiki/Kosaraju%27s_algorithm#The_algorithm
         """
-        
+
         # Let P be a directed graph and node_list be an empty stack.
         node_list = []
         communication_classes = []
-        
+
         # While node_list does not contain all vertices:
         while(len(node_list) < self.num_nodes):
-            # Choose an arbitrary vertex node not in node_list. 
+            # Choose an arbitrary vertex node not in node_list.
             node = [node for node in range(0, self.num_nodes) if node not in node_list][0]
-            # Perform a depth-first search starting at node. 
-            # Each time that depth-first search finishes expanding a vertex u, 
+            # Perform a depth-first search starting at node.
+            # Each time that depth-first search finishes expanding a vertex u,
             # push u onto node_list.
             depth_first_search(self.T, node, node_list)
-            
+
         # Reverse the directions of all arcs to obtain the transpose graph.
         reverse_graph = copy.deepcopy(np.transpose(self.T))
-          
-        # While node_list is nonempty: 
+
+        # While node_list is nonempty:
         while(len(node_list) > 0):
             # Pop the top vertex node from node_list.
             node = node_list.pop()
-            
-            # Perform a depth-first search starting at node in the transpose graph. 
-            # The set of visited vertices will give the strongly connected component 
+
+            # Perform a depth-first search starting at node in the transpose graph.
+            # The set of visited vertices will give the strongly connected component
             # containing node.
             comm_class = []
-            depth_first_search(reverse_graph, node, comm_class)        
+            depth_first_search(reverse_graph, node, comm_class)
             communication_classes.append(comm_class)
-        
+
             # remove all these vertices from the graph and the stack node_list.
             for x in comm_class:
                 reverse_graph[x, :] = 0.
                 reverse_graph[:, x] = 0.
-                
+
             node_list = [x for x in node_list if x not in comm_class]
 
         return communication_classes
