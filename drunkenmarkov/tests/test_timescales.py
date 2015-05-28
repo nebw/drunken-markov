@@ -4,7 +4,7 @@ import numpy as np
 
 from unittest import TestCase
 
-from drunkenmarkov.Analysis import msm
+from drunkenmarkov.Analysis import MarkovStateModel
 
 class TimescaleTests(TestCase):
     def test_timescales_simple(self):
@@ -15,7 +15,7 @@ class TimescaleTests(TestCase):
         """
         T = np.array([[0.9, 0.1, 0.0], [0.5, 0.0, 0.5], [0.0, 0.1, 0.9]])
 
-        markovmodel = msm(T)
+        markovmodel = MarkovStateModel(T)
         comp_timescales = markovmodel.timescales
         ref_timescales = np.array([np.inf, 9.49122158, 0.43429448])
         
