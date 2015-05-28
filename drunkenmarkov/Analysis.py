@@ -45,6 +45,13 @@ class MarkovStateModel:
         return True
 
     @property
+    def num_nodes(self):
+        """
+        Return number of nodes
+        """
+        return self.T.shape[0]
+
+    @property
     def is_connected(self):
         """
         Check if the given matrix is connected (=irreducible)
