@@ -4,6 +4,7 @@ import numpy as np
 
 from .Util import get_adjacent_nodes, depth_first_search
 
+
 class MarkovStateModel:
     def __init__(self, T, lagtime=1.):
         self.T = T
@@ -24,11 +25,11 @@ class MarkovStateModel:
         # all elements should be positive
         if not (self.T >= 0).all():
             return False
-        
+
         # sum of each row should be 1.
-        if not (all([self.T[i, :].sum() == 1. for i in range(self.T.shape[0])])):
+        if not np.allclose([self.T[i, :].sum() for i in range(self.T.shape[0])], 1.):
             return False
-        
+
         return True
 
     @property
