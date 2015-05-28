@@ -8,6 +8,10 @@ from .Util import get_adjacent_nodes, depth_first_search
 class MarkovStateModel:
     def __init__(self, T, lagtime=1.):
         self.T = T
+
+        if not self.is_transition_matrix:
+            raise ValueError("T is not a transition matrix")
+
         # compute eigenvalues
         W, _ = np.linalg.eig(T)
         self.eigenv = sorted(W, reverse=True)
@@ -22,6 +26,14 @@ class MarkovStateModel:
         """
         Check if the given matrix is a transition matrix (stochastic matrix)
         """
+        # matrix should have exactly two dimensions
+        if not len(self.T.shape) == 2:
+            return False
+
+        # matrix should be quadratic
+        if not self.T.shape[0] == self.T.shape[1]:
+            return False
+
         # all elements should be positive
         if not (self.T >= 0).all():
             return False
