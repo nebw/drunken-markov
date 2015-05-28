@@ -21,16 +21,15 @@ class MarkovStateModel:
         """
         Check if the given matrix is a transition matrix (stochastic matrix)
         """
-        tmatrix = True
-        for rowi in range(0, len(self.T[0, :])):
-            for coli in range(0, len(self.T[0, :])):
-                if self.T[rowi,coli] < 0:
-                    tmatrix = False
-            if self.T[rowi, :].sum() != 1:
-                tmatrix = False
-        if tmatrix == False:
-            print ('no stochastic matrix')
-        return tmatrix
+        # all elements should be positive
+        if not (self.T >= 0).all():
+            return False
+        
+        # sum of each row should be 1.
+        if not (all([self.T[i, :].sum() == 1. for i in range(self.T.shape[0])])):
+            return False
+        
+        return True
 
     @property
     def is_connected(self):
