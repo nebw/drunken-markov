@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import matplotlib.image as mpimg
+from io import BytesIO
+from PIL import Image
 import pygraphviz as pgv
-import tempfile
 
 from .Util import get_adjacent_nodes
 
@@ -31,10 +31,6 @@ def plot_graph(msm, with_comm_classes=False):
             label = '%.2f' % msm.T[from_node, to_node]
             g.add_edge(from_node, to_node, label=label)
 
-    img = None
-    with tempfile.NamedTemporaryFile(suffix='.png') as fp:
-        g.layout(prog='dot')
-        g.draw(fp.name)
-
-        img = mpimg.imread(fp.name)
-    return img
+    g.layout(prog='dot')
+    data = g.draw(format='png')
+    return Image.open(BytesIO(data))
