@@ -23,7 +23,7 @@ before_install:
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose
   - python setup.py install
-  - pip install coveralls --use-mirrors
+  - pip install coveralls
 
 # run tests and collect coverage data
 script: 
