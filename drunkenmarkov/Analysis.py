@@ -74,10 +74,11 @@ class MarkovStateModel:
             # und in die i-te Zeile der stationaeren Verteilung stat_dist
             # schreiben
             stat_dist[i] = eigenvectors[i][b]
-        # stationaere Verteilung normieren
+        # stationaere Verteilung normieren und positiv machen
         stat_dist_norm = np.linalg.norm(stat_dist,1)
         for i in range(0, len(self.T[0, :])):
             stat_dist[i] /= stat_dist_norm
+            stat_dist[i] = np.absolute(stat_dist[i])
         return stat_dist
 
     @property

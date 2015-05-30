@@ -18,4 +18,11 @@ class StationaryTests(TestCase):
 
         markovmodel = MarkovStateModel(T)
         pi = markovmodel.stationary_distribution
+
+        # test if stationary distribution is a stochastic vector (has norm 1 and no negative entries)
+        self.assertTrue(np.sum(pi),1.0)
+        for i in range(0, len(T[0, :])):
+            self.assertGreaterEqual(pi[i],0)
+
+        # test if stationary distribution * transition matrix = stationary distribution
         self.assertTrue(np.allclose(np.dot(pi, T), pi, rtol=1e-05, atol=1e-08))
