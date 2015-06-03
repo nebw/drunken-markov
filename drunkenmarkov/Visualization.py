@@ -7,7 +7,7 @@ import pygraphviz as pgv
 from .Util import get_adjacent_nodes
 
 
-def plot_graph(msm, with_comm_classes=False):
+def get_graph(msm, with_comm_classes=False):
     """Draw a graph representation of the chain using pygraphviz."""
 
     g = pgv.AGraph(strict=False, directed=True)
@@ -30,6 +30,12 @@ def plot_graph(msm, with_comm_classes=False):
         for to_node in get_adjacent_nodes(msm, from_node, discard_self=False):
             label = '%.2f' % msm.T[from_node, to_node]
             g.add_edge(from_node, to_node, label=label)
+
+    return g
+
+
+def draw_graph(msm, with_comm_classes=False):
+    g = get_graph(msm, with_comm_classes)
 
     g.layout(prog='dot')
     data = g.draw(format='png')
