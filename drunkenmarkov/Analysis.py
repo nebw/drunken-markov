@@ -176,6 +176,7 @@ class TransitionPathTheory:
         # This might not be necessary here, but can be useful at some
         # other point of the project.
         self._fcom = None
+        self._bcom = None
 
     @property
     def fcom(self):
@@ -200,3 +201,27 @@ class TransitionPathTheory:
             self._fcom = solve(W, y)
 
         return self._fcom
+
+    @property
+    def bcom(self):
+        """
+        Compute the forward committor.
+        """
+
+        if not self._bcom:
+            from scipy.linalg import solve
+
+            L = self.T - np.eye(len(self.T[0, :]))
+            W = np.eye(len(L[0, :]))
+            for i in range(len(W[:, 0])):
+                if i != self.a and i != self.b:
+                    W[i, :] = L[i, :]
+
+            y = np.zeros_like(self.T[:, 0])
+            for i in range(len(y)):
+                if i == self.a:
+                    y[i] = 1.
+
+            self._bcom = solve(W, y)
+
+        return self._bcom
