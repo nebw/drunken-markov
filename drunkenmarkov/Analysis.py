@@ -159,3 +159,40 @@ class MarkovStateModel:
             node_list = [x for x in node_list if x not in comm_class]
 
         return communication_classes
+
+class TransitionPathTheory:
+    def __init__(self, T, a, b):
+        self.T = T
+        self.a = a
+        self.b = b
+
+        if not isinstance(T, np.ndarray):
+            raise TypeError("T is no numpy array")
+        #if not MarkovStateModel.is_transition_matrix:
+        #    raise ValueError("T is not a transition matrix")
+
+        #self.lagtime = lagtime
+        # only compute the timescales if they are called explicitly.
+        # This might not be necessary here, but can be useful at some
+        # other point of the project.
+        self._fcom = None
+
+    @property
+    def fcom(self):
+        from scipy.linalg import solve
+
+
+        L = self.T - np.eye(len(self.T[0, :]))
+        W = np.eye(len(L[0, :]))
+        for i in range(len(W[:, 0])):
+            if i != self.a and i != self.b:
+                W[i, :] = L[i, :]
+
+        y = np.zeros_like(self.T[:, 0])
+        for i in range(len(y)):
+            if i == self.b:
+                y[i] = 1.
+
+        self._fcom = solve(W, y)
+
+        return self._fcom
