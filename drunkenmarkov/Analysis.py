@@ -9,6 +9,8 @@ class MarkovStateModel:
     def __init__(self, T, lagtime=1.):
         self.T = T
 
+        if not isinstance(T, np.ndarray):
+            raise TypeError("T is no numpy array")
         if not self.is_transition_matrix:
             raise ValueError("T is not a transition matrix")
 
