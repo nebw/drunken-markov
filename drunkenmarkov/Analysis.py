@@ -231,12 +231,12 @@ class TransitionPathTheory:
             L = self.T - np.eye(len(self.T[0, :]))
             W = np.eye(len(L[0, :]))
             for i in range(len(W[:, 0])):
-                if i != self.a and i != self.b:
+                if i not in self.a and i not in self.b:
                     W[i, :] = L[i, :]
 
             y = np.zeros_like(self.T[:, 0])
             for i in range(len(y)):
-                if i == self.a:
+                if i in self.a:
                     y[i] = 1.
 
             self._bcom = solve(W, y)
