@@ -5,7 +5,7 @@ python:
   - 3.3
 
 notifications:
-  email: false
+  email: true
 
 # Setup anaconda - adapted from https://gist.github.com/dan-blanchard/7045057
 # This is mainly to work around an issue when installing scipy via pip
@@ -21,7 +21,8 @@ before_install:
 
 # Install packages
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose
+  - sudo apt-get -qq install graphviz > /dev/null
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose pygraphviz pillow
   - python setup.py install
   - pip install coveralls
 
