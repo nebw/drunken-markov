@@ -269,7 +269,7 @@ class TransitionPathTheory:
         
     @property
     def probability_current(self):
-    	"""
+        """
         Compute the probability current according to Script Lecture 4 p. 5. Note that vector operations are used for better performance.
         """
         if not self._probability_current:
@@ -278,4 +278,3 @@ class TransitionPathTheory:
             _probability_current = np.kron(self.stationary_distribution * self.bcom , self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros
         return self._probability_current
          
-    				
