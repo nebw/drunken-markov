@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
+import pygraphviz as pgv
 
 def get_adjacent_nodes(msm, node, discard_self=True):
     adjacent_nodes = set(np.where(msm.T[node, :] > 0.)[0].tolist())
@@ -18,3 +19,16 @@ def depth_first_search(msm, node, node_list, visited_nodes=None):
 
     if node not in node_list:
         node_list.append(node)
+
+# fix for the pygraphviz graph constructor, which ignores the /strict/ argument on windows
+# source: http://stackoverflow.com/questions/14374412/how-do-i-make-an-undirected-graph-in-pygraphviz
+def AGraph(directed=False, strict=True, name='', **args):
+    """Fixed AGraph constructor."""
+
+    graph = '{0} {1} {2} {{}}'.format(
+        'strict' if strict else '',
+        'digraph' if directed else 'graph',
+        name
+    )
+
+    return pgv.AGraph(graph, **args)
