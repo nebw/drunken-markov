@@ -166,6 +166,12 @@ class TransitionPathTheory:
         self.a = a
         self.b = b
 
+        if not isinstance(a, list) or not isinstance(b, list):
+            raise TypeError("a and b must be lists")
+
+        if len(set(a) - set(b)) != len(a):
+            raise ValueError("sets a and b must be disjunct")
+
         if not isinstance(T, np.ndarray):
             raise TypeError("T is no numpy array")
         #if not MarkovStateModel.is_transition_matrix:
