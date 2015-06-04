@@ -159,6 +159,15 @@ class MarkovStateModel:
             node_list = [x for x in node_list if x not in comm_class]
 
         return communication_classes
+		
+        @property
+        def pcca(self, m):
+            """Use the pyemma pcca routine to calculate the matrix of membership probabilities
+            for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
+            """			
+            from pyemma.msm.analysis import pcca
+            return pcca(self.T,m)
+			
 
 class TransitionPathTheory:
     def __init__(self, T, a, b):
@@ -177,6 +186,8 @@ class TransitionPathTheory:
         # other point of the project.
         self._fcom = None
         self._bcom = None
+        self._probability_current = None
+        self._stationary_distribution = None
 
     @property
     def fcom(self):
@@ -190,12 +201,12 @@ class TransitionPathTheory:
             L = self.T - np.eye(len(self.T[0, :]))
             W = np.eye(len(L[0, :]))
             for i in range(len(W[:, 0])):
-                if i != self.a and i != self.b:
+                if i not in self.a and i not in self.b:
                     W[i, :] = L[i, :]
 
             y = np.zeros_like(self.T[:, 0])
             for i in range(len(y)):
-                if i == self.b:
+                if i in self.b:
                     y[i] = 1.
 
             self._fcom = solve(W, y)
@@ -205,7 +216,7 @@ class TransitionPathTheory:
     @property
     def bcom(self):
         """
-        Compute the forward committor.
+        Compute the backward committor.
         """
 
         if not self._bcom:
@@ -225,3 +236,40 @@ class TransitionPathTheory:
             self._bcom = solve(W, y)
 
         return self._bcom
+        
+    @property
+    def stationary_distribution(self):
+        """
+        Compute the stationary distribution for the Markov Chain
+        """
+        if not _stationary_distribution:
+            ewp = np.linalg.eig(np.transpose(self.T))
+            eigenvalues = ewp[0]
+            eigenvectors = ewp[1]
+            # Index b des Eigenwertes 1 finden:
+            b = np.where(eigenvalues==1)
+            _stationary_distribution = np.zeros(len(self.T[0, :]))
+            for i in range(0, len(self.T[0, :])):
+                # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
+                # und in die i-te Zeile der stationaeren Verteilung stat_dist
+                # schreiben
+                stat_dist[i] = eigenvectors[i][b]
+            # stationaere Verteilung normieren und positiv machen
+            stat_dist_norm = np.linalg.norm(_stationary_distribution,1)
+            for i in range(0, len(self.T[0, :])):
+                _stationary_distribution[i] /= stat_dist_norm
+                _stationary_distribution[i] = np.absolute(stat_dist[i])
+        return _stationary_distribution
+        
+    @property
+    def probability_current(self):
+    	
+        if not self._probability_current:
+            self._probability_current = np.zeros_like(self.T)
+            for i in len(self.dim):
+                for j in len(self.dim):
+                    if (i != j):
+                        self._probability_current[i,j] = self.stationary_distribution[i]*bcom[i]*T[i,j]*fcom[j]
+        return self._probability_current
+         
+    				
