@@ -18,7 +18,7 @@ class TPTTests(TestCase):
 
         rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]])
         K = scipy.linalg.expm(rate_matrix)
-        TPT = TransitionPathTheory(K, 0, 1)
+        TPT = TransitionPathTheory(K, [0], [1])
 
         fcom = TPT.fcom
         ref_fcom = np.array([0, 1., 0.0156032])
@@ -34,7 +34,7 @@ class TPTTests(TestCase):
 
         rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]])
         K = scipy.linalg.expm(rate_matrix)
-        TPT = TransitionPathTheory(K, 0, 1)
+        TPT = TransitionPathTheory(K, [0], [1])
 
         bcom = TPT.bcom
         ref_bcom = np.array([1.,  0., 0.9843968])
