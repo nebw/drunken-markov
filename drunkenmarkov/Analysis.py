@@ -242,7 +242,7 @@ class TransitionPathTheory:
         """
         Compute the stationary distribution for the Markov Chain
         """
-        if not _stationary_distribution:
+        if not self._stationary_distribution:
             ewp = np.linalg.eig(np.transpose(self.T))
             eigenvalues = ewp[0]
             eigenvectors = ewp[1]
@@ -263,13 +263,13 @@ class TransitionPathTheory:
         
     @property
     def probability_current(self):
-    	
+    	"""
+        Compute the probability current according to Script Lecture 4 p. 5. Note that vector operations are used for better performance.
+        """
         if not self._probability_current:
             self._probability_current = np.zeros_like(self.T)
-            for i in len(self.dim):
-                for j in len(self.dim):
-                    if (i != j):
-                        self._probability_current[i,j] = self.stationary_distribution[i]*bcom[i]*T[i,j]*fcom[j]
+            diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
+            _probability_current = np.kron(self.stationary_distribution * self.bcom , self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros
         return self._probability_current
          
     				
