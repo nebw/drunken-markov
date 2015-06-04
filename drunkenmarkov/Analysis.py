@@ -69,7 +69,7 @@ class MarkovStateModel:
         eigenvalues = ewp[0]
         eigenvectors = ewp[1]
         # Index b des Eigenwertes 1 finden:
-        b = np.where(eigenvalues==1)
+        b = np.where(np.isclose(eigenvalues, 1.))
         stat_dist = np.zeros(len(self.T[0, :]))
         for i in range(0, len(self.T[0, :])):
             # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
