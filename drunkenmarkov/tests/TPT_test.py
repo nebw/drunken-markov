@@ -16,7 +16,7 @@ class TPTTests(TestCase):
         in early 2015 at FU Berlin.
         """
 
-        rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]]).astype(float)
+        rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]])
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
 
@@ -32,7 +32,7 @@ class TPTTests(TestCase):
         in early 2015 at FU Berlin.
         """
 
-        rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]]).astype(float)
+        rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]])
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
 

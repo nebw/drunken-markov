@@ -10,8 +10,6 @@ from scipy.spatial import KDTree
 class KMeans(object):
 	# the number of clusters for k-means
 	k = None
-	# the final tree of the clustering algorithm
-	_kdtree = None
 	
 	# creates a new k-means clustering object with a specified k
 	def __init__(self, k = None):
@@ -21,11 +19,6 @@ class KMeans(object):
 			
 		self.k = k
 	
-	# discretizes data points with the previously calculated cluster centers
-	def discretise(self, data):
-		_, clusters = self._kdtree.query(data)
-		return clusters
-		
 	# clusters a matrix of observations and returns an Clusters object
 	def cluster(self, data):
 		# maps data point to cluster index; optimizes stopping criteria
@@ -54,11 +47,7 @@ class KMeans(object):
 			# and finally update the cluster centers to be the centroids of the voronoi subsets
 			cluster_map = data_membership
 			current_cluster_centers = [np.median(data[cluster_map == i, :], axis=0) for i in range(self.k)]
-			
-			# remember the kd tree to be able to cluster additional data later on
-			self._kdtree = cluster_center_tree
-			
+		
 		return Clusters(data = data, 
 						membership = cluster_map, 
-						cluster_centers = current_cluster_centers,
-						algorithm = self)
+						cluster_centers = current_cluster_centers)

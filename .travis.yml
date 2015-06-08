@@ -21,11 +21,10 @@ before_install:
 
 # Install packages
 install:
-  - sudo apt-get -qq install graphviz libgraphviz-dev > /dev/null
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose
+  - sudo apt-get -qq install graphviz > /dev/null
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose pygraphviz pillow
   - python setup.py install
   - pip install coveralls
-  - pip install pygraphviz
 
 # run tests and collect coverage data
 script: 
