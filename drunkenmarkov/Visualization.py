@@ -4,13 +4,13 @@ from io import BytesIO
 from PIL import Image
 import pygraphviz as pgv
 
-from .Util import get_adjacent_nodes
+from .Util import get_adjacent_nodes, AGraph
 
 
 def get_graph(msm, with_comm_classes=False):
     """Draw a graph representation of the chain using pygraphviz."""
 
-    g = pgv.AGraph(strict=False, directed=True)
+    g = AGraph(strict=False, directed=True)
 
     g.graph_attr.update(size="7.75, 10.25")
     g.graph_attr.update(dpi="300")
