@@ -194,7 +194,10 @@ class TransitionPathTheory:
         self._bcom = None
         self._probability_current = None
         self._stationary_distribution = None
-
+        self._effective_probability_current = None
+        self._flux = None
+        self._transition_rate = None
+        self._mean_first_passage_time = None
     @property
     def fcom(self):
         """
@@ -275,6 +278,52 @@ class TransitionPathTheory:
         if not self._probability_current:
             self._probability_current = np.zeros_like(self.T)
             diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
-            _probability_current = np.kron(self.stationary_distribution * self.bcom , self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros
+            _probability_current = np.kron(self.stationary_distribution * self.bcom , self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
         return self._probability_current
-         
+
+    @property
+    def effective_probability_current(self):
+        """
+        Compute the effective probability current according to Script Lecture 4 p. 5. Note that still no vector operations are used for better performance. When do we have to use self.?
+        """
+        if not self._effective_probability_current:
+            self._effective_probability_current = np.zeros_like(self.T)
+            for i in range(len(self.T[0])):
+                for j in range(i, len(self.T[0])):
+                    if(self.probability_current[i][j] > self.probability_current[j][i]):
+                        self._effective_probability_current[i][j] = self.probability_current[i][j] - self.probability_current[j][i]
+                        self._effective_probability_current[j][i] = 0.
+                    else:
+                        self._effective_probability_current[i][j] = 0.
+                        self._effective_probability_current[j][i] = self.probability_current[j][i] - self.probability_current[i][j]
+        return self._effective_probability_current
+
+    @property
+    def flux(self):
+        """
+        Compute the average total number of trajectories going from A to B per time unit. Note that vector operations are used for better performance. When do we have to use self.?
+        """
+        if not self._flux:
+            self._flux = 0.
+            for i in self.a:
+                    self._flux += sum(self._probability_current[i])
+        return self._flux
+
+    @property
+    def transition_rate(self):
+        """
+        Compute the average fraction of reactive trajectories by the total number of trajectories that are going forward from state A. Note that vector operations are used for better performance. When do we have to use self.?
+        """
+        if not self._transition_rate:
+            self._transition_rate = self._flux/(sum(self._stationary_distribution * self._bcom))
+        return self._transition_rate
+
+    @property
+    def mean_first_passage_time(self):
+        """
+        Compute the mean first passage time. Note that vector operations are used for better performance. When do we have to use self.?
+        """
+        if not self._mean_first_passage_time:
+            self._mean_first_passage_time = 1/self._transition_rate
+        return self._mean_first_passage_time
+# Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
