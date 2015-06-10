@@ -2,9 +2,12 @@
 
 from io import BytesIO
 from PIL import Image
-import pygraphviz as pgv
+import pygraphviz as pgv  # pgv not used, delete? 
 
 from .Util import get_adjacent_nodes, AGraph
+
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_graph(msm, with_comm_classes=False):
@@ -40,3 +43,52 @@ def draw_graph(msm, with_comm_classes=False):
     g.layout(prog='dot')
     data = g.draw(format='png')
     return Image.open(BytesIO(data))
+
+
+def plot_stationary(centers, pi, plot_pi_orig=True, output_file=None):
+    """
+    Plot the stationary distribution as function of the
+    cluster centers by linear interpolation.
+    """
+
+    import scipy.interpolate
+
+    # get center coordinates
+    x = centers[:, 0]
+    y = centers[:, 1]
+
+    img_ratio = (y.max() - y.min()) / (x.max() - x.min())
+    pixels = 100**2
+
+    # interpolate and meshgrid these coordinates
+    xi, yi = np.linspace(x.min(), x.max(), int(np.sqrt(pixels / img_ratio))),\
+        np.linspace(y.min(), y.max(), int(np.sqrt(pixels * img_ratio)))
+    xi, yi = np.meshgrid(xi, yi)
+
+    # interpolate the stationary distribution
+    rbf = scipy.interpolate.Rbf(x, y, pi, function='linear')
+    pii = rbf(xi, yi)
+
+    # plot the interpolated distribution
+    ax = plt.subplot(111)
+    plt.imshow(pii, vmin=pi.min(), vmax=pi.max(), origin='lower',
+               extent=[x.min(), x.max(), y.min(), y.max()])
+
+    # add the not-interpolated distribution as scatter plot
+    if plot_pi_orig:
+        plt.scatter(x, y, c=pi, s=60)
+
+    # add colorbar
+    plt.colorbar()
+
+    # export
+    if output_file:
+        plt.savefig(output_file)
+        print 'Figure saved as ', output_file
+
+    return ax
+
+
+def draw_stationary(centers, pi, plot_pi_orig=True):
+    plot_stationary(centers, pi, plot_pi_orig)
+    plt.show()
