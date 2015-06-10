@@ -45,15 +45,20 @@ def draw_graph(msm, with_comm_classes=False):
     return Image.open(BytesIO(data))
 
 
-def plot_stationary(centers, pi, plot_pi_orig=True, output_file=None):
+def interp_density_plot(centers, z, plot_pi_orig=True):
     """
-    Plot the stationary distribution as function of the
-    cluster centers by linear interpolation.
+    Plot a linearly interpolated function of the
+    cluster centers.
     """
 
     import scipy.interpolate
 
     # get center coordinates
+    if centers.shape[1] != 2:
+        raise ValueError('Centers coordinates must be 2 dimensional')
+    elif z.ndim != 1:
+        raise ValueError('Stationary distribution must be a vector')
+
     x = centers[:, 0]
     y = centers[:, 1]
 
@@ -66,29 +71,62 @@ def plot_stationary(centers, pi, plot_pi_orig=True, output_file=None):
     xi, yi = np.meshgrid(xi, yi)
 
     # interpolate the stationary distribution
-    rbf = scipy.interpolate.Rbf(x, y, pi, function='linear')
-    pii = rbf(xi, yi)
+    rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
+    zi = rbf(xi, yi)
 
     # plot the interpolated distribution
     ax = plt.subplot(111)
-    plt.imshow(pii, vmin=pi.min(), vmax=pi.max(), origin='lower',
+    plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
                extent=[x.min(), x.max(), y.min(), y.max()])
 
     # add the not-interpolated distribution as scatter plot
     if plot_pi_orig:
-        plt.scatter(x, y, c=pi, s=60)
+        plt.scatter(x, y, c=z, s=60)
 
     # add colorbar
     plt.colorbar()
+
+    return ax
+
+
+def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
+    """
+    Draw a density plot of the stationary distribution as a function
+    of the cluster centers.
+
+    Optional:
+    Show the not-interpolated distribution (plot_pi_orig=True).
+    Save the plot as file (output_file='path/to/file.png')
+    """
+
+    interp_density_plot(centers, pi, plot_pi_orig)
+    plt.title('Stationary Distribution')
 
     # export
     if output_file:
         plt.savefig(output_file)
         print 'Figure saved as ', output_file
+    else:
+        plt.show()
 
-    return ax
 
+def draw_free_energy(centers, pi, T=300, output_file=None):
+    """
+    Draw the free energy difference landscape at given temperature T
+    (in Kelvin, default: T = 300K). Uses the definition
+    A = - 1/kT *log(pi) and sets lowest point to zero.
+    """
 
-def draw_stationary(centers, pi, plot_pi_orig=True):
-    plot_stationary(centers, pi, plot_pi_orig)
-    plt.show()
+    kT = (8.314472 * T) / 1000.  # in kJ per mol
+    A = - kT * np.log(pi)
+    A = A - A.min()
+
+    interp_density_plot(centers, A, plot_pi_orig=False)
+    plt.title('Free Energy Landscape (kJ/mol) @ %d K' % T)
+
+    # export
+    if output_file:
+        plt.savefig(output_file)
+        print 'Figure saved as ', output_file
+    else:
+        plt.show()
