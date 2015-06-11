@@ -25,7 +25,7 @@ install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy nose matplotlib
   - python setup.py install
   - pip install coveralls
-  - pip install pygraphviz
+  - pip install pygraphviz==1.3rc2
   - pip install pillow
 
 # run tests and collect coverage data
