@@ -71,6 +71,9 @@ class Clusters(object):
 	def centers(self):
 		return self.getClusterCenters()
 
+	def get_centers(self):
+		return self._map
+
 # Clusters a matrix of observations with a specified clustering algorithm.
 # returns a Clusters object.
 def cluster(data, algorithm=None, **kwargs):
