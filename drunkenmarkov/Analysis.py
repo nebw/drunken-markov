@@ -2,7 +2,7 @@
 import copy
 import numpy as np
 
-from .Util import get_adjacent_nodes, depth_first_search
+from .Util import get_adjacent_nodes, depth_first_search, gcd
 
 
 class MarkovStateModel:
@@ -83,31 +83,33 @@ class MarkovStateModel:
             stat_dist[i] = np.absolute(stat_dist[i])
         return stat_dist
 
+  
+
     @property
     def period(self):
         """
         Compute the period of a Markov Chain with transition matrix T
         """
         d = 0
-        v = np.zeros(num_nodes(self.T))
+        n = self.T.shape[0]
+        v = np.zeros(n)
         D = [0]
         E = []
         m = len(D)
-        if is_connected(self.T):
-            while (m > 0 and d != 1):
-                i = D[0]
-                D.remove(i)
-                E.append(i)
-                j = 0
-                while (j < num_nodes(self.T)):
-                    if self.T[i,j] > 0:
-                        if j in D or j in E:
-                            d = gcd(d,v[i]+1-v[j])
-                        else:
-                            D.append(j)
-                            v[j] = v[i] + 1
-                    j = j+1
-                m = len(D)
+        while (m > 0 and d != 1):
+            i = D[0]
+            D.remove(i)
+            E.append(i)
+            j = 0
+            while (j < n):
+                if self.T[i,j] > 0:
+                    if j in D or j in E:
+                        d = gcd(d,v[i]+1-v[j])
+                    else:
+                        D.append(j)
+                        v[j] = v[i] + 1
+                j = j+1
+            m = len(D)
         return d
 
     @property

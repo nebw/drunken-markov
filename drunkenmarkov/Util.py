@@ -20,6 +20,19 @@ def depth_first_search(msm, node, node_list, visited_nodes=None):
     if node not in node_list:
         node_list.append(node)
 
+def gcd(a,b):
+    m = np.minimum(np.absolute(a),np.absolute(b))
+    M = np.maximum(np.absolute(a),np.absolute(b))
+    if m == 0:
+        return M
+    u = 1
+    while u != 0:
+        u = M % m
+        if u == 0:
+            return m
+        M = m
+        m = u  
+
 # fix for the pygraphviz graph constructor, which ignores the /strict/ argument on windows
 # source: http://stackoverflow.com/questions/14374412/how-do-i-make-an-undirected-graph-in-pygraphviz
 def AGraph(directed=False, strict=True, name='', **args):
