@@ -84,6 +84,33 @@ class MarkovStateModel:
         return stat_dist
 
     @property
+    def period(self):
+        """
+        Compute the period of a Markov Chain with transition matrix T
+        """
+        d = 0
+        v = np.zeros(num_nodes(self.T))
+        D = [0]
+        E = []
+        m = len(D)
+        if is_connected(self.T):
+            while (m > 0 and d != 1):
+                i = D[0]
+                D.remove(i)
+                E.append(i)
+                j = 0
+                while (j < num_nodes(self.T)):
+                    if self.T[i,j] > 0:
+                        if j in D or j in E:
+                            d = gcd(d,v[i]+1-v[j])
+                        else:
+                            D.append(j)
+                            v[j] = v[i] + 1
+                    j = j+1
+                m = len(D)
+        return d
+
+    @property
     def timescales(self):
         """
         Compute the time scales of a given transition matrix T.
