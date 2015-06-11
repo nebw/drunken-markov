@@ -26,6 +26,7 @@ install:
   - python setup.py install
   - pip install coveralls
   - pip install pygraphviz
+  - pip install pillow
 
 # run tests and collect coverage data
 script: 

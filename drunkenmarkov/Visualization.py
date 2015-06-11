@@ -2,7 +2,7 @@
 
 from io import BytesIO
 from PIL import Image
-import pygraphviz as pgv  # pgv not used, delete? 
+import pygraphviz as pgv  # pgv not used, delete?
 
 from .Util import get_adjacent_nodes, AGraph
 
@@ -105,7 +105,7 @@ def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
     # export
     if output_file:
         plt.savefig(output_file)
-        print 'Figure saved as ', output_file
+        print('Figure saved as ', output_file)
     else:
         plt.show()
 
@@ -127,6 +127,6 @@ def draw_free_energy(centers, pi, T=300, output_file=None):
     # export
     if output_file:
         plt.savefig(output_file)
-        print 'Figure saved as ', output_file
+        print('Figure saved as ', output_file)
     else:
         plt.show()
