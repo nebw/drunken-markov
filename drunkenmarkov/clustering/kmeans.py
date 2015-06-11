@@ -28,6 +28,9 @@ class KMeans(object):
 		
 	# clusters a matrix of observations and returns an Clusters object
 	def cluster(self, data):
+		# special case: the data might be a simple list - convert it to a standard feature matrix first!
+		if (not isinstance(data, np.ndarray)) or len(data.shape) < 2:
+			data = np.transpose(np.array([data]))
 		# maps data point to cluster index; optimizes stopping criteria
 		data_length = len(data)
 		cluster_map = [-1] * data_length
