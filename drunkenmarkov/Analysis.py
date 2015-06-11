@@ -278,7 +278,7 @@ class TransitionPathTheory:
         if not self._probability_current:
             self._probability_current = np.zeros_like(self.T)
             diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
-            _probability_current = np.kron(self.stationary_distribution * self.bcom , self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
+            self._probability_current = np.kron(self.stationary_distribution * self._bcom , self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
         return self._probability_current
 
     @property
