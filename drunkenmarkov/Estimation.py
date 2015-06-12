@@ -2,9 +2,9 @@
 import numpy as np
 
 def cmatrix(clusters):
-	""" Simple count matrix
-	Input: clusters object from clustering algorithm
-	"""
+    """ Simple count matrix
+    Input: clusters object from clustering algorithm
+    """
 
     C = np.zeros((clusters.ncenters, clusters.ncenters))
     membership = clusters.get_centers()
@@ -13,10 +13,16 @@ def cmatrix(clusters):
     return C
 
 def tmatrix(cmatrix):
-	""" simple transition matrix estimator """
+    """ simple non-reversible transition matrix estimator """
 
-    T = np.zeros_like(cmatrix)
-    for row in range(len(cmatrix[0, :])):
-        T[row, :] = cmatrix[row, :] / sum(cmatrix[row, :])
+    # check if cmatrix is integer valued (will otherwise return zeros)
+    if isinstance(cmatrix[0,0], int):
+        _cmatrix = np.array(cmatrix, dtype=float)
+    else:
+        _cmatrix = np.copy(cmatrix)
+
+    T = np.zeros_like(_cmatrix)
+    for row in range(len(_cmatrix[0, :])):
+        T[row, :] = _cmatrix[row, :] / sum(_cmatrix[row, :])
     return T
 
