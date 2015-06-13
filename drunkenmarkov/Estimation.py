@@ -19,11 +19,9 @@ def tmatrix(cmatrix):
 
     # check if cmatrix is integer valued (will otherwise return zeros)
     if issubclass(cmatrix.dtype.type, int):
-        _cmatrix = np.array(cmatrix, dtype=float)
-    else:
-        _cmatrix = np.copy(cmatrix)
+        cmatrix = cmatrix.astype(dtype=float, copy=False)
 
-    T = np.zeros_like(_cmatrix)
-    for row in range(len(_cmatrix[0, :])):
-        T[row, :] = _cmatrix[row, :] / sum(_cmatrix[row, :])
+    T = np.zeros_like(cmatrix, dtype=float)
+    for row in range(cmatrix.shape[0]):
+        T[row, :] = cmatrix[row, :] / float(sum(cmatrix[row, :]))
     return T
