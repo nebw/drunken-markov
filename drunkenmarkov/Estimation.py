@@ -2,15 +2,15 @@
 import numpy as np
 
 
-def cmatrix(clusters):
+def cmatrix(disc_traj, tau=1):
     """ Simple count matrix
-    Input: clusters object from clustering algorithm
+    Input: discrete trajectory
     """
 
-    C = np.zeros((clusters.ncenters, clusters.ncenters))
-    membership = clusters.get_centers()
-    for i in range(len(membership) - 1):
-        C[membership[i], membership[i+1]] += 1
+    n_centers = int(disc_traj.max()) + 1
+    C = np.zeros((n_centers, n_centers))
+    for i in range(0, len(disc_traj) - 1, tau):
+        C[disc_traj[i], disc_traj[i+1]] += 1
     return C
 
 
