@@ -2,6 +2,7 @@
 
 import numpy as np
 from unittest import TestCase
+from drunkenmarkov.Analysis import MarkovStateModel
 from drunkenmarkov.Estimation import estimate_nonreversible, \
     estimate_reversible, cmatrix
 
@@ -38,6 +39,20 @@ class EstimatorTest(TestCase):
         T_rowsums = T.sum(axis=1)
 
         self.assertTrue(np.allclose(T_rowsums, np.ones_like(T_rowsums), rtol=1.e-5))
+
+    def test_reversible_estimator_detailed_balance(self):
+        """
+        Test whether the estimated transition matrix fulfills the detailed
+        balance criteritum.
+        """
+        C = np.random.randint(1000, size=(10, 10))
+        T = estimate_reversible(C)
+        MSM = MarkovStateModel(T)
+        P = MSM.stationary_distribution
+
+        for i in range(T.shape[0]):
+            for j in range(T.shape[1]):
+                self.assertTrue(np.allclose(P[i] * T[i, j], P[j] * T[j, i]))
 
 
 class CMatrixTest(TestCase):
