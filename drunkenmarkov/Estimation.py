@@ -1,5 +1,7 @@
 #!/usr/bin/python
+
 import numpy as np
+import sys
 
 
 def cmatrix(disc_traj, tau=1):
@@ -14,14 +16,46 @@ def cmatrix(disc_traj, tau=1):
     return C
 
 
-def tmatrix(cmatrix):
+def estimate_nonreversible(C):
     """ simple non-reversible transition matrix estimator """
 
     # check if cmatrix is integer valued (will otherwise return zeros)
-    if issubclass(cmatrix.dtype.type, int):
-        cmatrix = cmatrix.astype(dtype=float, copy=False)
+    if issubclass(C.dtype.type, int):
+        C = C.astype(dtype=float, copy=False)
 
-    T = np.zeros_like(cmatrix, dtype=float)
-    for row in range(cmatrix.shape[0]):
-        T[row, :] = cmatrix[row, :] / float(sum(cmatrix[row, :]))
+    T = np.zeros_like(C, dtype=float)
+    for row in range(C.shape[0]):
+        T[row, :] = C[row, :] / sum(C[row, :])
+    return T
+
+
+def estimate_reversible(C):
+    """Maximum likelihood estimator of reversible transition matrix"""
+
+    assert(C.shape[0] == C.shape[1])
+
+    # use non-reversible transition matrix as initial guess
+    T = estimate_nonreversible(C)
+
+    # iterate until convergence
+    max_delta = sys.float_info.max
+    while max_delta > 1e-10:
+        max_delta = 0.
+        T_old = np.copy(T)
+        for i in range(C.shape[0]):
+            # c_i / x_i(k)
+            ci_over_ti = sum(C[i, :]) / sum(T_old[i, :])
+            for j in range(C.shape[1]):
+                # c_j / x_j(k)
+                cj_over_tj = sum(C[j, :]) / sum(T_old[j, :])
+                T[i, j] = (C[i, j] + C[j, i]) / (ci_over_ti + cj_over_tj)
+                delta = T[i, j] - T_old[i, j]
+                # use only the maximum delta in the current iteration as
+                # convergence critera
+                if (abs(delta) > max_delta):
+                    max_delta = abs(delta)
+    # normalize
+    for i in range(C.shape[0]):
+        T[i, :] /= sum(T[i, :])
+
     return T
