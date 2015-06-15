@@ -4,15 +4,20 @@ import numpy as np
 import sys
 
 
-def cmatrix(disc_traj, tau=1):
+def cmatrix(disc_traj, tau=1, sliding_window=False):
     """ Simple count matrix
     Input: discrete trajectory
     """
 
     n_centers = int(disc_traj.max()) + 1
     C = np.zeros((n_centers, n_centers))
-    for i in range(0, len(disc_traj) - 1, tau):
-        C[disc_traj[i], disc_traj[i+1]] += 1
+
+    # Without sliding window: evaluate every tau steps and count transition
+    # from state i to state i + tau.
+    # With sliding window: evaluate every step and count transition from state
+    # i to state i + tau.
+    for i in range(0, len(disc_traj) - tau, sliding_window * (1 - tau) + tau):
+        C[disc_traj[i], disc_traj[i + tau]] += 1
     return C
 
 

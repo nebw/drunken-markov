@@ -65,3 +65,23 @@ class CMatrixTest(TestCase):
         cmatrix_compare = np.array([[2., 2.], [1., 4.]])
         cmatrix_computed = cmatrix(test_dtraj)
         self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))
+
+    def test_cmatrix_lagtime(self):
+        """
+        Tests if the sliding window keyword works.
+        """
+        test_dtraj = np.array([0, 1, 1, 0, 0, 0, 1, 1, 1, 1])
+        cmatrix_compare = np.array([[0., 2.], [1., 1.]])
+        cmatrix_computed = cmatrix(test_dtraj, tau=2, sliding_window=False)
+
+        self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))
+
+    def test_cmatrix_slidingwindow(self):
+        """
+        Tests if the sliding window keyword works.
+        """
+        test_dtraj = np.array([0, 1, 1, 0, 0, 0, 1, 1, 1, 1])
+        cmatrix_compare = np.array([[1., 3.], [2., 2.]])
+        cmatrix_computed = cmatrix(test_dtraj, tau=2, sliding_window=True)
+
+        self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))
