@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import math
 from io import BytesIO
 from PIL import Image
 import pygraphviz as pgv  # pgv not used, delete?
@@ -8,7 +9,8 @@ from .Util import get_adjacent_nodes, AGraph
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib.mlab import PCA
+import matplotlib.cm
 
 def get_graph(msm, with_comm_classes=False):
     """Draw a graph representation of the chain using pygraphviz."""
@@ -130,3 +132,25 @@ def draw_free_energy(centers, pi, T=300, output_file=None):
         print('Figure saved as ', output_file)
     else:
         plt.show()
+
+def draw_clusters(clusters, plotter=None):
+    """
+    Visualize clustered data and cluster membership in a new plot or with an existing axis object.
+    """
+    plotter = plotter or plt
+    
+    # use PCA to be able to visualize the data in two dimensions
+    all_data = clusters.getOriginalData()
+    pca = PCA(all_data)
+    
+    # for nicer visualization
+    data_length = len(all_data)
+    alpha = 1.0 / (math.sqrt(data_length))
+    if alpha < 0.05: alpha = 0.05
+    elif alpha > 0.75: alpha = 0.75
+    cluster_ids = clusters.getClusterIDs()
+    colormap = matplotlib.cm.get_cmap("jet", len(cluster_ids) + 1)
+    for index, cluster in enumerate(cluster_ids):
+        datapoints = all_data[clusters._map == cluster,:]
+        datapoints_transformed = pca.project(datapoints)
+        plotter.scatter(datapoints_transformed[:,0], datapoints_transformed[:,1], color=colormap(index), alpha=0.5)
