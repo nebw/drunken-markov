@@ -65,23 +65,26 @@ class MarkovStateModel:
         """
         Compute the stationary distribution for the Markov Chain
         """
-        ewp = np.linalg.eig(np.transpose(self.T))
-        eigenvalues = ewp[0]
-        eigenvectors = ewp[1]
-        # Index b des Eigenwertes 1 finden:
-        b = np.where(np.isclose(eigenvalues, 1.))
-        stat_dist = np.zeros(len(self.T[0, :]))
-        for i in range(0, len(self.T[0, :])):
-            # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
-            # und in die i-te Zeile der stationaeren Verteilung stat_dist
-            # schreiben
-            stat_dist[i] = eigenvectors[i][b]
-        # stationaere Verteilung normieren und positiv machen
-        stat_dist_norm = np.linalg.norm(stat_dist,1)
-        for i in range(0, len(self.T[0, :])):
-            stat_dist[i] /= stat_dist_norm
-            stat_dist[i] = np.absolute(stat_dist[i])
-        return stat_dist
+        if not self.is_connected:
+            raise ValueError("T is not irreducible")
+        else:
+            ewp = np.linalg.eig(np.transpose(self.T))
+            eigenvalues = ewp[0]
+            eigenvectors = ewp[1]
+            # Index b des Eigenwertes 1 finden:
+            b = np.where(np.isclose(eigenvalues, 1.))
+            stat_dist = np.zeros(len(self.T[0, :]))
+            for i in range(0, len(self.T[0, :])):
+                # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
+                # und in die i-te Zeile der stationaeren Verteilung stat_dist
+                # schreiben
+                stat_dist[i] = eigenvectors[i][b]
+            # stationaere Verteilung normieren und positiv machen
+            stat_dist_norm = np.linalg.norm(stat_dist,1)
+            for i in range(0, len(self.T[0, :])):
+                stat_dist[i] /= stat_dist_norm
+                stat_dist[i] = np.absolute(stat_dist[i])
+            return stat_dist
 
   
 
@@ -91,7 +94,7 @@ class MarkovStateModel:
         Compute the period of a Markov Chain with transition matrix T
         """
         if not self.is_connected:
-            raise ValueError("T is not a transition matrix")
+            raise ValueError("T is not irreducible")
         else:
             d = 0
             n = self.T.shape[0]
