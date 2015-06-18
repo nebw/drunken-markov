@@ -39,6 +39,10 @@ class Clusters(object):
 	def getClusterCenters(self):
 		return self._cluster_centers
 	
+	# returns a list with the assigned cluster IDs for the original data
+	def getDataMapping(self):
+		return self._map
+	
 	# discretizes additional data points with the previously used algorithm and clustering parameters
 	def discretise(self, data):
 		return self._algorithm.discretise(data)
@@ -72,7 +76,9 @@ class Clusters(object):
 		return self.getClusterCenters()
 
 	def get_centers(self):
-		return self._map
+		import warnings
+		warnings.warn("Function deprecated.. use getDataMapping()")
+		return self.getDataMapping()
 
 # Clusters a matrix of observations with a specified clustering algorithm.
 # returns a Clusters object.
