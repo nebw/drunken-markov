@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
-import scipy
+import scipy.linalg
 
 from unittest import TestCase
 

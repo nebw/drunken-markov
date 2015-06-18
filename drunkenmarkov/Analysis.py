@@ -141,10 +141,6 @@ class MarkovStateModel:
         return self._timescales
 
     @property
-    def num_nodes(self):
-        return len(self.T[0, :])
-
-    @property
     def communication_classes(self):
         """Linear time algorithm to find the strongly connected components of
         a directed graph.
@@ -275,30 +271,7 @@ class TransitionPathTheory:
 
         return self._bcom
         
-    @property
-    def stationary_distribution(self):
-        """
-        Compute the stationary distribution for the Markov Chain
-        """
-        if not self._stationary_distribution:
-            ewp = np.linalg.eig(np.transpose(self.T))
-            eigenvalues = ewp[0]
-            eigenvectors = ewp[1]
-            # Index b des Eigenwertes 1 finden:
-            b = np.where(eigenvalues==1)
-            _stationary_distribution = np.zeros(len(self.T[0, :]))
-            for i in range(0, len(self.T[0, :])):
-                # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
-                # und in die i-te Zeile der stationaeren Verteilung stat_dist
-                # schreiben
-                stat_dist[i] = eigenvectors[i][b]
-            # stationaere Verteilung normieren und positiv machen
-            stat_dist_norm = np.linalg.norm(_stationary_distribution,1)
-            for i in range(0, len(self.T[0, :])):
-                _stationary_distribution[i] /= stat_dist_norm
-                _stationary_distribution[i] = np.absolute(stat_dist[i])
-        return _stationary_distribution
-        
+
     @property
     def probability_current(self):
         """
@@ -307,7 +280,9 @@ class TransitionPathTheory:
         if not self._probability_current:
             self._probability_current = np.zeros_like(self.T)
             diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
-            self._probability_current = np.kron(self.stationary_distribution * self._bcom , self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
+
+            MSM = MarkovStateModel(self.T)
+            self._probability_current = np.kron(MSM.stationary_distribution * self._bcom , self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
         return self._probability_current
 
     @property
