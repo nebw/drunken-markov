@@ -90,27 +90,30 @@ class MarkovStateModel:
         """
         Compute the period of a Markov Chain with transition matrix T
         """
-        d = 0
-        n = self.T.shape[0]
-        v = np.zeros(n)
-        D = [0]
-        E = []
-        m = len(D)
-        while (m > 0 and d != 1):
-            i = D[0]
-            D.remove(i)
-            E.append(i)
-            j = 0
-            while (j < n):
-                if self.T[i,j] > 0:
-                    if j in D or j in E:
-                        d = gcd(d,v[i]+1-v[j])
-                    else:
-                        D.append(j)
-                        v[j] = v[i] + 1
-                j = j+1
+        if not self.is_connected:
+            raise ValueError("T is not a transition matrix")
+        else:
+            d = 0
+            n = self.T.shape[0]
+            v = np.zeros(n)
+            D = [0]
+            E = []
             m = len(D)
-        return d
+            while (m > 0 and d != 1):
+                i = D[0]
+                D.remove(i)
+                E.append(i)
+                j = 0
+                while (j < n):
+                    if self.T[i,j] > 0:
+                        if j in D or j in E:
+                            d = gcd(d,v[i]+1-v[j])
+                        else:
+                            D.append(j)
+                            v[j] = v[i] + 1
+                    j = j+1
+                m = len(D)
+            return d
 
     @property
     def timescales(self):
