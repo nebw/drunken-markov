@@ -39,6 +39,10 @@ class Clusters(object):
 	def getClusterCenters(self):
 		return self._cluster_centers
 	
+	# returns a reference to the original data used to instantiate this cluster.
+	def getOriginalData(self):
+		return self._data
+		
 	# returns a list with the assigned cluster IDs for the original data
 	def getDataMapping(self):
 		return self._map
