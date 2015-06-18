@@ -68,7 +68,8 @@ class CMatrixTest(TestCase):
 
     def test_cmatrix_lagtime(self):
         """
-        Tests if the sliding window keyword works.
+        Tests if using a lagtime reproduces the analytical result
+        of a simple example trajectory.
         """
         test_dtraj = np.array([0, 1, 1, 0, 0, 0, 1, 1, 1, 1])
         cmatrix_compare = np.array([[0., 2.], [1., 1.]])
@@ -78,7 +79,8 @@ class CMatrixTest(TestCase):
 
     def test_cmatrix_slidingwindow(self):
         """
-        Tests if the sliding window keyword works.
+        Tests if using the sliding window keyword reproduces the
+        analytical result of a simple example trajectory.
         """
         test_dtraj = np.array([0, 1, 1, 0, 0, 0, 1, 1, 1, 1])
         cmatrix_compare = np.array([[1., 3.], [2., 2.]])

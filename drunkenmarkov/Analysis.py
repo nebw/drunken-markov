@@ -190,14 +190,13 @@ class MarkovStateModel:
             node_list = [x for x in node_list if x not in comm_class]
 
         return communication_classes
-		
-        @property
-        def pcca(self, m):
-            """Use the pyemma pcca routine to calculate the matrix of membership probabilities
-            for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
-            """			
-            from pyemma.msm.analysis import pcca
-            return pcca(self.T,m)
+
+    def pcca(self, m):
+        """Use the pyemma pcca routine to calculate the matrix of membership probabilities
+        for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
+        """			
+        from pyemma.msm.analysis import pcca as pyemma_pcca
+        return pyemma_pcca(self.T, m)
 			
 
 class TransitionPathTheory:
@@ -229,6 +228,7 @@ class TransitionPathTheory:
         self._flux = None
         self._transition_rate = None
         self._mean_first_passage_time = None
+
     @property
     def fcom(self):
         """
@@ -276,7 +276,6 @@ class TransitionPathTheory:
             self._bcom = solve(W, y)
 
         return self._bcom
-        
 
     @property
     def probability_current(self):
