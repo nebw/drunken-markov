@@ -285,9 +285,8 @@ class TransitionPathTheory:
         if not self._probability_current:
             self._probability_current = np.zeros_like(self.T)
             diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
-
             MSM = MarkovStateModel(self.T)
-            self._probability_current = np.kron(MSM.stationary_distribution * self._bcom , self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros #fehlen hier nicht ein paar unterstriche?
+            self._probability_current = np.kron(MSM.stationary_distribution * self._bcom, self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros
         return self._probability_current
 
     @property
@@ -299,12 +298,12 @@ class TransitionPathTheory:
             self._effective_probability_current = np.zeros_like(self.T)
             for i in range(len(self.T[0])):
                 for j in range(i, len(self.T[0])):
-                    if(self.probability_current[i][j] > self.probability_current[j][i]):
-                        self._effective_probability_current[i][j] = self.probability_current[i][j] - self.probability_current[j][i]
+                    if(self._probability_current[i][j] > self._probability_current[j][i]):
+                        self._effective_probability_current[i][j] = self._probability_current[i][j] - self._probability_current[j][i]
                         self._effective_probability_current[j][i] = 0.
                     else:
                         self._effective_probability_current[i][j] = 0.
-                        self._effective_probability_current[j][i] = self.probability_current[j][i] - self.probability_current[i][j]
+                        self._effective_probability_current[j][i] = self._probability_current[j][i] - self._probability_current[i][j]
         return self._effective_probability_current
 
     @property
@@ -324,7 +323,8 @@ class TransitionPathTheory:
         Compute the average fraction of reactive trajectories by the total number of trajectories that are going forward from state A. Note that vector operations are used for better performance. When do we have to use self.?
         """
         if not self._transition_rate:
-            self._transition_rate = self._flux/(sum(self._stationary_distribution * self._bcom))
+            MSM = MarkovStateModel(self.T)
+            self._transition_rate = self._flux/(sum(MSM.stationary_distribution * self._bcom))
         return self._transition_rate
 
     @property
