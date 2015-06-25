@@ -2,11 +2,28 @@
 
 import numpy as np
 import scipy.linalg
+import sys
 
 from unittest import TestCase
 
 from drunkenmarkov.Analysis import TransitionPathTheory
-import pyemma.msm.flux as msmflux
+
+def onlypython2(fun):
+    """
+    This is a decorator that effectively disables a unit test when using
+    python 2 by replacing the test function with a lambda function that always
+    returns True.
+
+    pyEMMA is not available for python 3. Therefore we have to disable tests
+    based on pyEMMA when running python 3.
+    """
+    if sys.version_info >= (3, 0):
+        return lambda: True
+    else:
+        return fun
+
+if sys.version_info < (3, 0):
+    import pyemma.msm.flux as msmflux
 
 class TPTTests(TestCase):
     def test_fcom_simple(self):
@@ -40,6 +57,7 @@ class TPTTests(TestCase):
         ref_bcom = np.array([1.,  0., 0.9843968])
         self.assertTrue(np.allclose(bcom, ref_bcom, rtol=1.e-5))
 
+    @onlypython2
     def test_prob_current_simple(self):
         """
         Tests the implemented probability current function probability_current.
@@ -57,6 +75,7 @@ class TPTTests(TestCase):
         self.assertTrue(np.allclose(probcurrent, ref_prob, rtol=1.e-5))
 
 
+    @onlypython2
     def test_effective_prob_current_simple(self):
         """
         Tests the implemented effective probability current function effective_probability_current.
@@ -75,6 +94,7 @@ class TPTTests(TestCase):
         self.assertTrue(np.allclose(effec_probcurrent, ref_net_prob, rtol=1.e-5))
 
 
+    @onlypython2
     def test_flux_simple(self):
         """
         Tests the implemented FLUX function flux.
@@ -92,6 +112,7 @@ class TPTTests(TestCase):
         self.assertTrue(np.allclose(flux, ref_total_flux, rtol=1.e-5))
 
 
+    @onlypython2
     def test_rate_simple(self):
         """
         Tests the implemented rate function transition_rate.
@@ -109,6 +130,7 @@ class TPTTests(TestCase):
         self.assertTrue(np.allclose(transition_rate, ref_rate, rtol=1.e-5))
 
 
+    @onlypython2
     def test_mean_first_passage_time_simple(self):
         """
         Tests the implemented test_mean first passage time function test_mean_first_passage_time.
