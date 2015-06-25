@@ -28,6 +28,9 @@ def estimate_nonreversible(C):
     if issubclass(C.dtype.type, int):
         C = C.astype(dtype=float, copy=False)
 
+    if np.any(np.isclose([sum(C[n, :]) for n in range(len(C))], 0)):
+        raise ValueError('Count matrix contains rows with sum of 0.0.')
+
     T = np.zeros_like(C, dtype=float)
     for row in range(C.shape[0]):
         T[row, :] = C[row, :] / sum(C[row, :])
