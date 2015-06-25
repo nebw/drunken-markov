@@ -133,7 +133,7 @@ def draw_free_energy(centers, pi, T=300, output_file=None):
     else:
         plt.show()
 
-def draw_clusters(clusters, plotter=None):
+def draw_clusters(clusters, plotter=None, colormap_name="jet"):
     """
     Visualize clustered data and cluster membership in a new plot or with an existing axis object.
     """
@@ -149,7 +149,7 @@ def draw_clusters(clusters, plotter=None):
     if alpha < 0.05: alpha = 0.05
     elif alpha > 0.75: alpha = 0.75
     cluster_ids = clusters.getClusterIDs()
-    colormap = matplotlib.cm.get_cmap("jet", len(cluster_ids) + 1)
+    colormap = matplotlib.cm.get_cmap(colormap_name, len(cluster_ids) + 1)
     for index, cluster in enumerate(cluster_ids):
         datapoints = all_data[clusters._map == cluster,:]
         datapoints_transformed = pca.project(datapoints)
