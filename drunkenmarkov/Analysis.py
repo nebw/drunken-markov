@@ -6,7 +6,7 @@ from .Util import get_adjacent_nodes, depth_first_search, gcd
 
 
 class MarkovStateModel:
-    def __init__(self, T, lagtime=1.):
+    def __init__(self, T, lagtime=1., k=5):
         self.T = T
 
         if not isinstance(T, np.ndarray):
@@ -16,7 +16,7 @@ class MarkovStateModel:
 
         # compute eigenvalues
         W, _ = np.linalg.eig(T)
-        self.eigenv = sorted(W, reverse=True)
+        self.eigenv = sorted(W, reverse=True)[0:k]
         self.lagtime = lagtime
         # only compute the timescales if they are called explicitly.
         # This might not be necessary here, but can be useful at some
@@ -128,8 +128,8 @@ class MarkovStateModel:
         """
         if self._timescales is None:
             # test for complex eigenvalues
-            ev_is_cmplx = np.where(np.imag(self.eigenv) > 0.)
-            if sum(ev_is_cmplx) > 0:
+
+            if np.any(np.imag(self.eigenv) > 0.):
                 print('Complex eigenvalues found!')
 
             re_eigenv = np.real(self.eigenv)
