@@ -51,8 +51,7 @@ class TPTTests(TestCase):
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
         TPT_emma = msmflux.tpt(K, [0], [1])
-        fcom1 = TPT.fcom
-        bcom1 = TPT.bcom
+
         probcurrent = TPT.probability_current
         ref_prob = TPT_emma.flux
         self.assertTrue(np.allclose(probcurrent, ref_prob, rtol=1.e-5))
@@ -69,9 +68,8 @@ class TPTTests(TestCase):
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
         TPT_emma = msmflux.tpt(K, [0], [1])
-        fcom1 = TPT.fcom
-        bcom1 = TPT.bcom
-        probcurrent = TPT.probability_current
+
+        #probcurrent = TPT.probability_current
         effec_probcurrent = TPT.effective_probability_current
         ref_net_prob = TPT_emma.net_flux
         self.assertTrue(np.allclose(effec_probcurrent, ref_net_prob, rtol=1.e-5))
@@ -88,9 +86,7 @@ class TPTTests(TestCase):
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
         TPT_emma = msmflux.tpt(K, [0], [1])
-        fcom1 = TPT.fcom
-        bcom1 = TPT.bcom
-        probcurrent = TPT.probability_current
+
         flux = TPT.flux
         ref_total_flux = TPT_emma.total_flux
         self.assertTrue(np.allclose(flux, ref_total_flux, rtol=1.e-5))
@@ -107,10 +103,7 @@ class TPTTests(TestCase):
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
         TPT_emma = msmflux.tpt(K, [0], [1])
-        fcom1 = TPT.fcom
-        bcom1 = TPT.bcom
-        probcurrent = TPT.probability_current
-        flux = TPT.flux
+
         transition_rate = TPT.transition_rate
         ref_rate = TPT_emma.rate
         self.assertTrue(np.allclose(transition_rate, ref_rate, rtol=1.e-5))
@@ -127,13 +120,10 @@ class TPTTests(TestCase):
         K = scipy.linalg.expm(rate_matrix)
         TPT = TransitionPathTheory(K, [0], [1])
         TPT_emma = msmflux.tpt(K, [0], [1])
-        fcom1 = TPT.fcom
-        bcom1 = TPT.bcom
-        probcurrent = TPT.probability_current
-        flux = TPT.flux
-        transition_rate = TPT.transition_rate
+
         mfpt = TPT.mean_first_passage_time
         ref_mfpt = TPT_emma.mfpt
+
         self.assertTrue(np.allclose(mfpt, ref_mfpt, rtol=1.e-5))
 
 

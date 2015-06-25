@@ -235,7 +235,7 @@ class TransitionPathTheory:
         Compute the forward committor.
         """
 
-        if not self._fcom:
+        if self._fcom is None:
             from scipy.linalg import solve
 
             L = self.T - np.eye(len(self.T[0, :]))
@@ -258,8 +258,9 @@ class TransitionPathTheory:
         """
         Compute the backward committor.
         """
-
-        if not self._bcom:
+        #print 'bcom ', self._bcom
+        #print 'test ', not list(self._bcom)
+        if self._bcom is None:
             from scipy.linalg import solve
 
             L = self.T - np.eye(len(self.T[0, :]))
@@ -282,11 +283,11 @@ class TransitionPathTheory:
         """
         Compute the probability current according to Script Lecture 4 p. 5. Note that vector operations are used for better performance.
         """
-        if not self._probability_current:
+        if self._probability_current is None:
             self._probability_current = np.zeros_like(self.T)
             diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
             MSM = MarkovStateModel(self.T)
-            self._probability_current = np.kron(MSM.stationary_distribution * self._bcom, self._fcom).reshape(self.T.shape) * self.T * diagonal_zeros
+            self._probability_current = np.kron(MSM.stationary_distribution * self.bcom, self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros
         return self._probability_current
 
     @property
@@ -294,16 +295,16 @@ class TransitionPathTheory:
         """
         Compute the effective probability current according to Script Lecture 4 p. 5. Note that still no vector operations are used for better performance. When do we have to use self.?
         """
-        if not self._effective_probability_current:
+        if self._effective_probability_current is None:
             self._effective_probability_current = np.zeros_like(self.T)
             for i in range(len(self.T[0])):
                 for j in range(i, len(self.T[0])):
-                    if(self._probability_current[i][j] > self._probability_current[j][i]):
-                        self._effective_probability_current[i][j] = self._probability_current[i][j] - self._probability_current[j][i]
+                    if(self.probability_current[i][j] > self.probability_current[j][i]):
+                        self._effective_probability_current[i][j] = self.probability_current[i][j] - self.probability_current[j][i]
                         self._effective_probability_current[j][i] = 0.
                     else:
                         self._effective_probability_current[i][j] = 0.
-                        self._effective_probability_current[j][i] = self._probability_current[j][i] - self._probability_current[i][j]
+                        self._effective_probability_current[j][i] = self.probability_current[j][i] - self.probability_current[i][j]
         return self._effective_probability_current
 
     @property
@@ -311,10 +312,10 @@ class TransitionPathTheory:
         """
         Compute the average total number of trajectories going from A to B per time unit. Note that vector operations are used for better performance. When do we have to use self.?
         """
-        if not self._flux:
+        if self._flux is None:
             self._flux = 0.
             for i in self.a:
-                    self._flux += sum(self._probability_current[i])
+                    self._flux += sum(self.probability_current[i])
         return self._flux
 
     @property
@@ -322,9 +323,9 @@ class TransitionPathTheory:
         """
         Compute the average fraction of reactive trajectories by the total number of trajectories that are going forward from state A. Note that vector operations are used for better performance. When do we have to use self.?
         """
-        if not self._transition_rate:
+        if self._transition_rate is None:
             MSM = MarkovStateModel(self.T)
-            self._transition_rate = self._flux/(sum(MSM.stationary_distribution * self._bcom))
+            self._transition_rate = self.flux/(sum(MSM.stationary_distribution * self.bcom))
         return self._transition_rate
 
     @property
@@ -332,7 +333,7 @@ class TransitionPathTheory:
         """
         Compute the mean first passage time. Note that vector operations are used for better performance. When do we have to use self.?
         """
-        if not self._mean_first_passage_time:
-            self._mean_first_passage_time = 1/self._transition_rate
+        if self._mean_first_passage_time is None:
+            self._mean_first_passage_time = 1/self.transition_rate
         return self._mean_first_passage_time
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
