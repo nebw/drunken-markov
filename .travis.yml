@@ -2,6 +2,7 @@ language: python
 
 python:
   - 2.7
+  - 3.4
 
 notifications:
   email: true
@@ -26,9 +27,9 @@ install:
   - pip install coveralls
   - pip install pygraphviz==1.3rc2
   - pip install pillow
-  - conda config --add channels http://conda.binstar.org/omnia
-  - conda install binstar
-  - conda install pyemma
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; conda config --add channels http://conda.binstar.org/omnia
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; conda install binstar
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; conda install pyemma
 
 # run tests and collect coverage data
 script: 
