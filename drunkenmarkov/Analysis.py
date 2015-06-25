@@ -139,7 +139,7 @@ class MarkovStateModel:
             # take care of devision by zero (EV = 1) and compute time scales
             # for loop to be replaced by something faster
             for ii in range(len(re_eigenv)):
-                if (re_eigenv[ii] - 1.)**2 < 1e-5:
+                if np.isclose(re_eigenv[ii], 1., rtol=1e-20):
                     self._timescales[ii] = np.inf
                 else:
                     self._timescales[ii] = -self.lagtime / np.log(abs(re_eigenv[ii]))

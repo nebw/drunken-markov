@@ -8,6 +8,11 @@ def cmatrix(disc_traj, tau=1, sliding_window=False):
     """ Simple count matrix
     Input: discrete trajectory
     """
+    # rename states, delete empty ones
+    new_trajectory = np.array([None] * len(disc_traj))
+    for new_index, old_state in enumerate(np.unique(disc_traj)):
+        new_trajectory[disc_traj == old_state] = new_index
+    disc_traj = new_trajectory
 
     n_centers = int(disc_traj.max()) + 1
     C = np.zeros((n_centers, n_centers))
