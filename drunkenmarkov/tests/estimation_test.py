@@ -87,3 +87,15 @@ class CMatrixTest(TestCase):
         cmatrix_computed = cmatrix(test_dtraj, tau=2, sliding_window=True)
 
         self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))
+
+    def test_cmatrix_list(self):
+        """
+        Test count matrix list support.
+        """
+
+        test_dtraj = [np.array([0, 1, 1, 0, 0, 0, 1, 1, 1, 1]), \
+                    np.array([0,1,1,1,0])]
+
+        cmatrix_compare = np.array([[2., 3.], [2., 6.]])
+        cmatrix_computed = cmatrix(test_dtraj)
+        self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))

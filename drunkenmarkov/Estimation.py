@@ -4,25 +4,38 @@ import numpy as np
 import sys
 
 
-def cmatrix(disc_traj, tau=1, sliding_window=False):
+def cmatrix(disc_traj_list, tau=1, sliding_window=False):
     """ Simple count matrix
-    Input: discrete trajectory
+    Input: discrete trajectory or list of trajectories.
     """
-    # rename states, delete empty ones
-    new_trajectory = np.array([None] * len(disc_traj))
-    for new_index, old_state in enumerate(np.unique(disc_traj)):
-        new_trajectory[disc_traj == old_state] = new_index
-    disc_traj = new_trajectory
+    # if disc_traj_list is no list or np array, define it as one element list.
+    if not isinstance(disc_traj_list[0], (list, np.ndarray)):
+        disc_traj_list = [disc_traj_list]
 
-    n_centers = int(disc_traj.max()) + 1
+    # rename states, delete empty ones
+    new_trajectory = np.array([np.array([None] * len(disc_traj_list[n]))
+                              for n in range(len(disc_traj_list))])
+
+    # flatten the disc_traj_list to define the new assignment over
+    # all given trajectories
+    old_traj_flat = [item for sublist in disc_traj_list for item in sublist]
+
+    for n in range(len(disc_traj_list)):
+        for new_index, old_state in enumerate(np.unique(old_traj_flat)):
+            new_trajectory[n][disc_traj_list[n] == old_state] = new_index
+    disc_traj_list = new_trajectory
+
+    n_centers = int(max([item for sublist in disc_traj_list
+                    for item in sublist])) + 1
     C = np.zeros((n_centers, n_centers))
 
     # Without sliding window: evaluate every tau steps and count transition
     # from state i to state i + tau.
     # With sliding window: evaluate every step and count transition from state
     # i to state i + tau.
-    for i in range(0, len(disc_traj) - tau, sliding_window * (1 - tau) + tau):
-        C[disc_traj[i], disc_traj[i + tau]] += 1
+    for disc_traj in disc_traj_list:
+        for i in range(0, len(disc_traj) - tau, sliding_window * (1 - tau) + tau):
+            C[disc_traj[i], disc_traj[i + tau]] += 1
     return C
 
 
