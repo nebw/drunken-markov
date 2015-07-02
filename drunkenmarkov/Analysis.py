@@ -16,7 +16,7 @@ class MarkovStateModel:
 
         # compute eigenvalues
         W, _ = np.linalg.eig(T)
-        self.eigenv = sorted(W, reverse=True)[0:k]
+        self.eigenv = sorted(W, reverse=True, key=lambda x: abs(x))[0:k]
         self.lagtime = lagtime
         # only compute the timescales if they are called explicitly.
         # This might not be necessary here, but can be useful at some
