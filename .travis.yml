@@ -28,8 +28,8 @@ install:
   - pip install pygraphviz==1.3rc2
   - pip install pillow
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] ; then conda config --add channels http://conda.binstar.org/omnia ; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] ; then conda install binstar ; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] ; then conda install pyemma ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] ; then conda install binstar --yes ; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]] ; then conda install pyemma --yes ; fi
 
 # run tests and collect coverage data
 script: 
