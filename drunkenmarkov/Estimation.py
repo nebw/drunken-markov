@@ -19,9 +19,10 @@ def cmatrix(disc_traj_list, tau=1, sliding_window=False):
     # flatten the disc_traj_list to define the new assignment over
     # all given trajectories
     old_traj_flat = [item for sublist in disc_traj_list for item in sublist]
-
+    unique_old_states = np.unique(old_traj_flat)
+    
     for n in range(len(disc_traj_list)):
-        for new_index, old_state in enumerate(np.unique(old_traj_flat)):
+        for new_index, old_state in enumerate(unique_old_states):
             new_trajectory[n][disc_traj_list[n] == old_state] = new_index
     disc_traj_list = new_trajectory
 
