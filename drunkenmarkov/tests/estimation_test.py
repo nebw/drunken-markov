@@ -2,7 +2,7 @@
 
 import numpy as np
 from unittest import TestCase
-from drunkenmarkov.Analysis import MarkovStateModel
+from drunkenmarkov.Analysis import MarkovStateModel, get_connected_count_matrix
 from drunkenmarkov.Estimation import estimate_nonreversible, \
     estimate_reversible, cmatrix
 
@@ -99,3 +99,17 @@ class CMatrixTest(TestCase):
         cmatrix_compare = np.array([[2., 3.], [2., 6.]])
         cmatrix_computed = cmatrix(test_dtraj)
         self.assertTrue(np.allclose(cmatrix_compare, cmatrix_computed))
+        
+    def test_cmatrix_reduction(self):
+        """
+        Tests reducing a count matrix to the largest connected set.
+        """
+        cmat = np.array([[1,4,5,0,0],
+                        [1,4,5,0,0],
+                        [6,2,2,0,0],
+                        [0,0,0,3,7],
+                        [0,0,0,7,3]])
+        reduced_matrix = get_connected_count_matrix(cmat)
+        difference     = reduced_matrix - np.array([[1, 4, 5], [1, 4, 5], [6, 2, 2]])
+        self.assertTrue(np.sum(difference) == 0)
+

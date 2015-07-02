@@ -22,6 +22,8 @@ class MarkovStateModel:
         # This might not be necessary here, but can be useful at some
         # other point of the project.
         self._timescales = None
+        # also compute the communication classes lazily
+        self._communication_classes = None
 
     @property
     def is_transition_matrix(self):
@@ -148,56 +150,20 @@ class MarkovStateModel:
 
     @property
     def communication_classes(self):
-        """Linear time algorithm to find the strongly connected components of
-        a directed graph.
-
-        Pseudocode: http://en.wikipedia.org/wiki/Kosaraju%27s_algorithm#The_algorithm
         """
-
-        # Let P be a directed graph and node_list be an empty stack.
-        node_list = []
-        communication_classes = []
-
-        # While node_list does not contain all vertices:
-        while(len(node_list) < self.num_nodes):
-            # Choose an arbitrary vertex node not in node_list.
-            node = [node for node in range(0, self.num_nodes) if node not in node_list][0]
-            # Perform a depth-first search starting at node.
-            # Each time that depth-first search finishes expanding a vertex u,
-            # push u onto node_list.
-            depth_first_search(self.T, node, node_list)
-
-        # Reverse the directions of all arcs to obtain the transpose graph.
-        reverse_graph = copy.deepcopy(np.transpose(self.T))
-
-        # While node_list is nonempty:
-        while(len(node_list) > 0):
-            # Pop the top vertex node from node_list.
-            node = node_list.pop()
-
-            # Perform a depth-first search starting at node in the transpose graph.
-            # The set of visited vertices will give the strongly connected component
-            # containing node.
-            comm_class = []
-            depth_first_search(reverse_graph, node, comm_class)
-            communication_classes.append(comm_class)
-
-            # remove all these vertices from the graph and the stack node_list.
-            for x in comm_class:
-                reverse_graph[x, :] = 0.
-                reverse_graph[:, x] = 0.
-
-            node_list = [x for x in node_list if x not in comm_class]
-
-        return communication_classes
-
+        Finds and returns the communication classes from the transition matrix of this markov model.
+        """
+        if self._communication_classes is None:
+            self._communication_classes = calculate_communication_classes(self.T)
+        return self._communication_classes
+            
     def pcca(self, m):
         """Use the pyemma pcca routine to calculate the matrix of membership probabilities
         for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
-        """			
+        """            
         from pyemma.msm.analysis import pcca as pyemma_pcca
         return pyemma_pcca(self.T, m)
-			
+            
 
 class TransitionPathTheory:
     def __init__(self, T, a, b):
@@ -337,3 +303,64 @@ class TransitionPathTheory:
             self._mean_first_passage_time = 1/self.transition_rate
         return self._mean_first_passage_time
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
+
+
+def calculate_communication_classes(matrix):
+    """Linear time algorithm to find the strongly connected components of
+    a directed graph.
+    
+    Takes either a transition matrix or a count matrix.
+    
+    Pseudocode: http://en.wikipedia.org/wiki/Kosaraju%27s_algorithm#The_algorithm
+    """
+
+    # Let P be a directed graph and node_list be an empty stack.
+    node_list = []
+    communication_classes = []
+
+    # While node_list does not contain all vertices:
+    while(len(node_list) < matrix.shape[0]):
+        # Choose an arbitrary vertex node not in node_list.
+        node = [node for node in range(0, matrix.shape[0]) if node not in node_list][0]
+        # Perform a depth-first search starting at node.
+        # Each time that depth-first search finishes expanding a vertex u,
+        # push u onto node_list.
+        depth_first_search(matrix, node, node_list)
+
+    # Reverse the directions of all arcs to obtain the transpose graph.
+    reverse_graph = copy.deepcopy(np.transpose(matrix))
+
+    # While node_list is nonempty:
+    while(len(node_list) > 0):
+        # Pop the top vertex node from node_list.
+        node = node_list.pop()
+
+        # Perform a depth-first search starting at node in the transpose graph.
+        # The set of visited vertices will give the strongly connected component
+        # containing node.
+        comm_class = []
+        depth_first_search(reverse_graph, node, comm_class)
+        communication_classes.append(comm_class)
+
+        # remove all these vertices from the graph and the stack node_list.
+        for x in comm_class:
+            reverse_graph[x, :] = 0.
+            reverse_graph[:, x] = 0.
+
+        node_list = [x for x in node_list if x not in comm_class]
+
+    return communication_classes
+
+def get_connected_count_matrix(count_matrix):
+    """
+    Takes a count matrix and returns a count matrix where only the largest connected component remains.
+    """
+    communication_classes = calculate_communication_classes(count_matrix)
+    if len(communication_classes) <= 1:
+        return count_matrix
+    communication_classes = sorted(communication_classes, key=lambda x: len(x), reverse=True)
+    
+    import numpy as np
+    row_column_indices = sorted(np.array(communication_classes[0]))
+    matrix = np.array(count_matrix)[row_column_indices, :][:, row_column_indices]
+    return matrix
