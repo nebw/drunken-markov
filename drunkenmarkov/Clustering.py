@@ -91,6 +91,9 @@ class PCA:
 	def __init__(self, data):
 		if not isinstance(data, np.ndarray):
 			raise TypeError("Data must be numpy array")
+		#reject one dimensional data
+		if len(data.shape) ==  1:
+			raise TypeError("Data is already one dimensional")
 		#subtract mean from data
 		self.X = data - data.mean(axis = 0)
 		#calculate the covariance matrix. Factor of N-1 due to Bessels correction.
