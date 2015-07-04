@@ -103,21 +103,24 @@ class PCA:
 		self.Y = np.dot(self.X, self.W)
 		self.s = np.cumsum(self.sigma) / np.sum(self.sigma)
 
-    #returns all data with cummulative variance smaller than the cutoff
-	def get_reduced_data(self, cutoff = 1):
+	#return projection of the data on the first L pricipal axis or specify L by a cutoff of the cummulative variance
+	#if neither is given return full projection on eigenspace of the covariance matrix
+	def get_reduced_data(self, cutoff = 1, L = None):
+		if L is not None:
+			return self.Y[:,0:L]
 		return self.Y[:,np.where(self.s <= cutoff)[0]]
 
-    #returns the cummulative variance
+	#returns the cummulative variance
 	@property
 	def get_cummulative_variance(self):
 		return self.s
 
-    #returns transformation matrix
+	#returns transformation matrix
 	@property
 	def get_transformation_matrix(self):
 		return self.W
 
-    #returns variance vector
+	#returns variance vector
 	@property
 	def get_variance(self):
 		return self.sigma
