@@ -128,6 +128,11 @@ class PCA:
 	def get_variance(self):
 		return self.sigma
 
+	#return covariance matrix of trajectories in non-transformed space
+	@property
+	def get_covariance(self):
+			return self.C
+
 # Clusters a matrix of observations with a specified clustering algorithm.
 # returns a Clusters object.
 def cluster(data, algorithm=None, **kwargs):
