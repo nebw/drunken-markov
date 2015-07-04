@@ -93,9 +93,8 @@ class PCA:
 			raise TypeError("Data must be numpy array")
 		#subtract mean from data
 		self.X = data - data.mean(axis = 0)
-		#define covariance matrix
-		self.C = np.dot(np.transpose(self.X),self.X)
-		#use scipy as it returns eigenvalues ordered
+		#calculate the covariance matrix. Factor of N-1 due to Bessels correction.
+		self.C = np.dot(np.transpose(self.X),self.X)/(self.X.shape[0] - 1)
 		self.sigma = np.zeros(self.C.shape[0])
 		self.W = np.zeros_like(self.C)
 		self.sigma[::-1],self.W[:,::-1] = np.linalg.eigh(self.C)
