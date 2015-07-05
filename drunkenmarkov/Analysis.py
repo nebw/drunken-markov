@@ -76,16 +76,11 @@ class MarkovStateModel:
             # Index b des Eigenwertes 1 finden:
             b = np.where(np.isclose(eigenvalues, 1.))
             stat_dist = np.zeros(len(self.T[0, :]))
-            for i in range(0, len(self.T[0, :])):
-                # im i-ten Array des Eigenvektor-Arrays den b-ten Eintrag auslesen
-                # und in die i-te Zeile der stationaeren Verteilung stat_dist
-                # schreiben
-                stat_dist[i] = eigenvectors[i][b]
+            stat_dist = eigenvectors[:][b]
             # stationaere Verteilung normieren und positiv machen
+            stat_dist = np.absolute(stat_dist)
             stat_dist_norm = np.linalg.norm(stat_dist,1)
-            for i in range(0, len(self.T[0, :])):
-                stat_dist[i] /= stat_dist_norm
-                stat_dist[i] = np.absolute(stat_dist[i])
+            stat_dist /= stat_dist_norm
             return stat_dist
 
   
@@ -302,6 +297,13 @@ class TransitionPathTheory:
         if self._mean_first_passage_time is None:
             self._mean_first_passage_time = 1/self.transition_rate
         return self._mean_first_passage_time
+
+    @property
+    def dominant_pathways(self):
+        paths = find_paths(self.effective_probability_current, self.a, self.b)
+        currents = get_current_of_paths(paths, self.effective_probability_current)
+        pathnumber = range(len(paths))
+        return paths[dominant_pathway(currents, pathnumber)]
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
 
 
@@ -313,11 +315,7 @@ def find_paths(G, start, target):
     paths = []
     for a in start:
         paths.append([a])
-    
-    
     paths = expand(paths, G, target)
-    
-    
     return paths
 
 def expand(paths, G, target): 
@@ -336,12 +334,13 @@ def expand(paths, G, target):
                 path.append(j)
                 temp_path = path[:]
                 paths.append(temp_path)
-                path.remove(j)
+                del path[-1]
+    for i in paths[::-1]:
+        if len(i) > G.shape[0]:
+            paths.remove(i)
+            flag = True
     if not flag: 		#if it was propagated start expand again
         paths = expand(paths, G, target)
-                
-            
-    
     return paths		#if all dead ends are deleted and any path in target
     
 def get_current_of_paths(paths, G): 
@@ -358,19 +357,22 @@ def get_current_of_paths(paths, G):
     
     return effec_current_path
 
-def update_G(G, paths):  
-    """
-    update G by deleting all entries that are not usedin paths
-    """
-    Gmod = np.zeros_like(G)
-   
-    for i in range(len(paths)):
-       
-        for j in range(len(paths[i])-1):
-            Gmod[paths[i][j]][paths[i][j+1]] = G[paths[i][j]][paths[i][j+1]]
-    
-    
-    return Gmod
+
+def dominant_pathway(effec, pathnumber):
+    mins = np.zeros(len(pathnumber))
+    for i in range(len(pathnumber)):
+        mins[i] = (min(effec[pathnumber[i]]))
+    bottleneck_current = np.amax(mins)
+    not_dominant = np.where(mins != bottleneck_current)
+    if len(not_dominant[0]) < len(pathnumber) and len(not_dominant[0]) != 0:
+        for i in not_dominant[0][::-1]:
+            del pathnumber[i]
+    for i in effec:
+        if bottleneck_current in  i:
+            i.remove(bottleneck_current)
+    if [] in effec:
+        return effec.index([])
+    return dominant_pathway(effec, pathnumber)
     
 
 def calculate_communication_classes(matrix):
