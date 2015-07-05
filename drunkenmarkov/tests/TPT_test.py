@@ -148,5 +148,15 @@ class TPTTests(TestCase):
 
         self.assertTrue(np.allclose(mfpt, ref_mfpt, rtol=1.e-5))
 
+    @onlypython2
+    def test_dominant_pathway(self):
+        """
+        Test the dominant pathway method on the matrix used in the test above
+        """
+        rate_matrix = np.array([[-1, 1, 0], [100, -300, 200], [0, 1, -1]]).astype(float)
+        K = scipy.linalg.expm(rate_matrix)
+        TPT = TransitionPathTheory(K, [0], [1])
+        self.assertTrue(np.allclose(TPT.dominant_pathway, [0,2,1]))
+
 
 
