@@ -307,9 +307,9 @@ class TransitionPathTheory:
 
 
 def find_paths(G, start, target): 
-	"""
-	find all paths starting in list start ending in list target with direct matrix graph G initiate list of all paths
-	"""
+    """
+    find all paths starting in list start ending in list target with direct matrix graph G initiate list of all paths
+    """
     paths = []
     for a in start:
         paths.append([a])
@@ -321,9 +321,9 @@ def find_paths(G, start, target):
     return paths
 
 def expand(paths, G, target): 
-	"""
-	expand all paths in paths in all directions possible of G end in target
-	"""
+    """
+    expand all paths in paths in all directions possible of G end in target
+    """
     flag = True
     temp_paths = paths[:]
     for path in temp_paths:
@@ -345,9 +345,9 @@ def expand(paths, G, target):
     return paths		#if all dead ends are deleted and any path in target
     
 def get_current_of_paths(paths, G): 
-	"""
-	calculate out of all paths the effective current of all paths
-	"""
+    """
+    calculate out of all paths the effective current of all paths
+    """
     effec_current_path = []
     for i in range(len(paths)):
         temp_list=[]
@@ -359,9 +359,9 @@ def get_current_of_paths(paths, G):
     return effec_current_path
 
 def update_G(G, paths):  
-	"""
-	update G by deleting all entries that are not usedin paths
-	"""
+    """
+    update G by deleting all entries that are not usedin paths
+    """
     Gmod = np.zeros_like(G)
    
     for i in range(len(paths)):
