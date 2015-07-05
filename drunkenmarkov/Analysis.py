@@ -305,6 +305,46 @@ class TransitionPathTheory:
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
 
 
+
+def find_paths(G, start, target): 
+	"""
+	find all paths starting in list start ending in list target with direct matrix graph G initiate list of all paths
+	"""
+    paths = []
+    for a in start:
+        paths.append([a])
+    
+    
+    paths = expand(paths, G, target)
+    
+    
+    return paths
+
+def expand(paths, G, target): 
+	"""
+	expand all paths in paths in all directions possible of G end in target
+	"""
+    flag = True
+    temp_paths = paths[:]
+    for path in temp_paths:
+        if path[-1] not in target and (G[path[-1]]).all == 0:#if it is not in target and there is an dead end 
+            paths.remove(path)   #delete this path
+        elif path[-1] not in target and not (G[path[-1]]).all == 0: #if it is not in target and not a dead end
+            flag = False		#propagate one step in all possible directions
+            paths.remove(path)
+            for j in np.where(G[path[-1]]>0)[0]:
+                path.append(j)
+                temp_path = path[:]
+                paths.append(temp_path)
+                path.remove(j)
+    if not flag: 		#if it was propagated start expand again
+        paths = expand(paths, G, target)
+                
+            
+    
+    return paths		#if all dead ends are deleted and any path in target
+
+
 def calculate_communication_classes(matrix):
     """Linear time algorithm to find the strongly connected components of
     a directed graph.
@@ -364,3 +404,4 @@ def get_connected_count_matrix(count_matrix):
     row_column_indices = sorted(np.array(communication_classes[0]))
     matrix = np.array(count_matrix)[row_column_indices, :][:, row_column_indices]
     return matrix
+
