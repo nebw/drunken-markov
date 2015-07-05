@@ -357,20 +357,6 @@ def get_current_of_paths(paths, G):
         effec_current_path.append(temp_list)
     
     return effec_current_path
-
-def update_G(G, paths):  
-    """
-    update G by deleting all entries that are not usedin paths
-    """
-    Gmod = np.zeros_like(G)
-   
-    for i in range(len(paths)):
-       
-        for j in range(len(paths[i])-1):
-            Gmod[paths[i][j]][paths[i][j+1]] = G[paths[i][j]][paths[i][j+1]]
-    
-    
-    return Gmod
     
 
 def calculate_communication_classes(matrix):
