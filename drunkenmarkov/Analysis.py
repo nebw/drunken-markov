@@ -336,7 +336,11 @@ def expand(paths, G, target):
                 path.append(j)
                 temp_path = path[:]
                 paths.append(temp_path)
-                path.remove(j)
+                del path[-1]
+    for i in paths[::-1]:
+        if len(i) > G.shape[0]:
+            paths.remove(i)
+            flag = True
     if not flag: 		#if it was propagated start expand again
         paths = expand(paths, G, target)
                 
