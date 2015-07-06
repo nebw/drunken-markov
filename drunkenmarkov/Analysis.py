@@ -130,9 +130,9 @@ class MarkovStateModel:
                 m = len(D)
             return d
             if d == 1:
-                print "This Markov chain is aperiodic and converges to its stationary distribution"
+                print ("This Markov chain is aperiodic and converges to its stationary distribution")
             else:
-                print "This Markov chain is periodic with period" % d
+                print ("This Markov chain is periodic with period" % d)
 
 
     @property
