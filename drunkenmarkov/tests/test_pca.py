@@ -1,8 +1,26 @@
 import numpy as np
 from unittest import TestCase
 import drunkenmarkov.Clustering
-from pyemma.coordinates import pca as emma_pca
+import sys
 
+def onlypython2(fun):
+    """
+    This is a decorator that effectively disables a unit test when using
+    python 2 by replacing the test function with a lambda function that always
+    returns True.
+
+    pyEMMA is not available for python 3. Therefore we have to disable tests
+    based on pyEMMA when running python 3.
+    """
+    if sys.version_info >= (3, 0):
+        return lambda: True
+    else:
+        return fun
+
+if sys.version_info < (3, 0):
+    from pyemma.coordinates import pca as emma_pca
+
+@onlypython2
 class PCATests(TestCase):
 	def test_PCA(self):
 		"""
