@@ -26,3 +26,5 @@ class StationaryTests(TestCase):
 
         # test if stationary distribution * transition matrix = stationary distribution
         self.assertTrue(np.allclose(np.dot(pi, T), pi, rtol=1e-05, atol=1e-08))
+        #while we're at it, we might as well just check whether is_reversible works
+        self.assertTrue(markovmodel.is_reversible)

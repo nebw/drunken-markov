@@ -13,7 +13,6 @@ class MarkovStateModel:
             raise TypeError("T is no numpy array")
         if not self.is_transition_matrix:
             raise ValueError("T is not a transition matrix")
-
         # compute eigenvalues
         W, _ = np.linalg.eig(T)
         self.eigenv = sorted(W, reverse=True, key=lambda x: abs(x))[0:k]
@@ -47,6 +46,15 @@ class MarkovStateModel:
             return False
 
         return True
+
+    @property
+    def is_reversible(self):
+        """
+        Check if the transition matrix fulfills the detailed balance condition
+        pi(i) * T(i,j) == pi(j) * T(j, i)
+        """
+        pi = np.diag(self.stationary_distribution)
+        return np.allclose(np.dot(pi, self.T), np.dot(np.transpose(self.T), pi))
 
     @property
     def num_nodes(self):
