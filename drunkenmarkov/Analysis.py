@@ -73,7 +73,7 @@ class MarkovStateModel:
     @property
     def stationary_distribution(self):
         """
-        Compute the stationary distribution for the Markov Chain
+        Compute the stationary distribution of a Markov Chain with transition matrix T
         """
         if not self.is_connected:
             raise ValueError("T is not irreducible")
@@ -102,6 +102,8 @@ class MarkovStateModel:
     def period(self):
         """
         Compute the period of a Markov Chain with transition matrix T
+        (since only irreducible Markov Chains are considered all states have the same period,
+        in particular the Markov Chain is either periodic or aperiodic)
         """
         if not self.is_connected:
             raise ValueError("T is not irreducible")
@@ -127,6 +129,11 @@ class MarkovStateModel:
                     j = j+1
                 m = len(D)
             return d
+            if d == 1:
+                print "This Markov chain is aperiodic and converges to its stationary distribution"
+            else:
+                print "This Markov chain is periodic with period" % d
+
 
     @property
     def timescales(self):
