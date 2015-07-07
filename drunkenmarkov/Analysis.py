@@ -141,14 +141,13 @@ class MarkovStateModel:
             re_eigenv = np.real(self.eigenv)
             # continue with real part only
             self._timescales = np.zeros_like(re_eigenv)
-
-            # take care of devision by zero (EV = 1) and compute time scales
-            # for loop to be replaced by something faster
-            for ii in range(len(re_eigenv)):
-                if np.isclose(re_eigenv[ii], 1., rtol=1e-20):
-                    self._timescales[ii] = np.inf
-                else:
-                    self._timescales[ii] = -self.lagtime / np.log(abs(re_eigenv[ii]))
+            #find index corresponding to stationary distributio
+            problematic_index = np.where(np.isclose(re_eigenv, 1., rtol=1e-20))
+            #replace problematic value with one that behaves well
+            re_eigenv[problematic_index] = 20.
+            self._timescales = -self.lagtime / np.log(np.absolute(re_eigenv))
+            #set stationary timescale to infinity
+            self._timescales[problematic_index] = np.inf
 
         return self._timescales
 
