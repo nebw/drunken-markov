@@ -25,7 +25,7 @@ class StationaryTests(TestCase):
         markovmodel_3 = MarkovStateModel(V)
         pi_1 = markovmodel_1.stationary_distribution
         pi_2 = markovmodel_2.stationary_distribution
-        #pi_3 = markovmodel_3.stationary_distribution (fails!)
+        pi_3 = markovmodel_3.stationary_distribution
 
         # test if stationary distribution is a stochastic vector (has norm 1 and no negative entries)
         self.assertTrue(np.sum(pi_1),1.0)
@@ -39,10 +39,10 @@ class StationaryTests(TestCase):
         # test if stationary distribution * transition matrix = stationary distribution
         self.assertTrue(np.allclose(np.dot(pi_1, T), pi_1, rtol=1e-05, atol=1e-08))
         self.assertTrue(np.allclose(np.dot(pi_2, U), pi_2, rtol=1e-05, atol=1e-08))
-        #self.assertTrue(np.allclose(np.dot(pi_3, V), pi_3, rtol=1e-05, atol=1e-08))
+        self.assertTrue(np.allclose(np.dot(pi_3, V), pi_3, rtol=1e-05, atol=1e-08))
 
 
         #while we're at it, we might as well just check whether is_reversible works
         self.assertTrue(markovmodel_1.is_reversible)
         self.assertTrue(markovmodel_2.is_reversible)
-        #self.assertFalse(markovmodel_3.is_reversible)
+        self.assertFalse(markovmodel_3.is_reversible)
