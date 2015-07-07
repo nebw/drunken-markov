@@ -21,6 +21,7 @@ class MarkovStateModel:
         # This might not be necessary here, but can be useful at some
         # other point of the project.
         self._timescales = None
+        self._stat_dist = None
         # also compute the communication classes lazily
         self._communication_classes = None
 
@@ -75,16 +76,16 @@ class MarkovStateModel:
         """
         Compute the stationary distribution of a Markov Chain with transition matrix T
         """
-        if not self.is_connected:
-            raise ValueError("T is not irreducible")
-        else:
-            eigenvalues, eigenvectors = np.linalg.eig(np.transpose(self.T))
-            # Stationary distribution ist the eigenvector to the eigenvalue 1
-            stat_dist = eigenvectors[:,np.where(np.isclose(eigenvalues, 1.))].reshape(self.T.shape[0])
-            #Normalize stationary distribution s.t. the sum over all entries yields 1
-            return np.absolute(stat_dist / np.linalg.norm(stat_dist,1))
-
-  
+        if self._stat_dist is None:
+            if not self.is_connected:
+                raise ValueError("T is not irreducible")
+            else:
+                eigenvalues, eigenvectors = np.linalg.eig(np.transpose(self.T))
+                # Stationary distribution ist the eigenvector to the eigenvalue 1
+                self._stat_dist = eigenvectors[:,np.where(np.isclose(eigenvalues, 1.))].reshape(self.T.shape[0])
+                #Normalize stationary distribution s.t. the sum over all entries yields 1
+                self._stat_dist = np.absolute(self._stat_dist / np.linalg.norm(self._stat_dist,1))
+        return self._stat_dist
 
     @property
     def period(self):
