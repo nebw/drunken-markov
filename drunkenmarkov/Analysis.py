@@ -209,7 +209,7 @@ class TransitionPathTheory:
         self._flux = None
         self._transition_rate = None
         self._mean_first_passage_time = None
-
+        self._dominant_pathway = None
     @property
     def fcom(self):
         """
@@ -320,12 +320,31 @@ class TransitionPathTheory:
 
     @property
     def dominant_pathway(self):
-        paths = find_paths(self.effective_probability_current,self.a,self.b)
-        current = get_current_of_paths(paths, self.effective_probability_current)
-        pathnumber = range(len(paths))
-        return paths[dominant_pathway(current, pathnumber)]
+        if self._dominant_pathway is None:
+            paths = find_paths(self.effective_probability_current,self.a,self.b)
+            current = get_current_of_paths(paths, self.effective_probability_current)
+            pathnumber = range(len(paths))
+            self._dominant_pathway = paths[dominant_pathway(current, pathnumber)]
+        return self._dominant_pathway
+        
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
+    @property
+    def num_nodes(self):
+        """
+        Return number of nodes
+        """
+        return self.T.shape[0]
 
+    @property
+    def dominant_pathway_format(self):
+        """
+        Makes dominant pathway to stepwise list
+        """
+        paths_format = [] 
+        dominant = self.dominant_pathway
+        for i in range(len(dominant)-1):
+            paths_format.append([dominant[i],dominant[i+1]])        
+        return paths_format
 
 
 def find_paths(G, start, target): 
