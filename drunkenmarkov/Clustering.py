@@ -85,9 +85,9 @@ class Clusters(object):
 		return self.getDataMapping()
 
 
-#Performs PCA on an array of data
+#Performs principal component analysis on an array of data
 #note that this does not support a list of trajectories(yet)
-class PCA:
+class pca:
 	def __init__(self, data):
 		if not isinstance(data, np.ndarray):
 			raise TypeError("Data must be numpy array")
@@ -98,39 +98,41 @@ class PCA:
 		self.X = data - data.mean(axis = 0)
 		#calculate the covariance matrix. Factor of N-1 due to Bessels correction.
 		self.C = np.dot(np.transpose(self.X),self.X)/(self.X.shape[0] - 1)
-		self.sigma = np.zeros(self.C.shape[0])
-		self.W = np.zeros_like(self.C)
-		self.sigma[::-1],self.W[:,::-1] = np.linalg.eigh(self.C)
-		#TODO: sort eigenvalues by size and eigenvectors respectively if they are not sorted yet
-		self.Sigma = np.diag(self.sigma)
+		self.sigma,self.W = np.linalg.eigh(self.C)
+		#sort eigenvalues and - vectors descending
+		idx = np.argsort(np.absolute(self.sigma))
+		self.sigma = self.sigma[idx[::-1]]
+		self.W = self.W[:,idx[::-1]]
+		#calculate transformed data
 		self.Y = np.dot(self.X, self.W)
+		#calculate cummulative variance as cutoff criterion
 		self.s = np.cumsum(self.sigma) / np.sum(self.sigma)
 
 	#return projection of the data on the first L pricipal axis or specify L by a cutoff of the cummulative variance
 	#if neither is given return full projection on eigenspace of the covariance matrix
-	def get_reduced_data(self, cutoff = 1, L = None):
+	def reduced_data(self, cutoff = 1, L = None):
 		if L is not None:
 			return self.Y[:,0:L]
 		return self.Y[:,np.where(self.s <= cutoff)[0]]
 
 	#returns the cummulative variance
 	@property
-	def get_cummulative_variance(self):
+	def cummulative_variance(self):
 		return self.s
 
 	#returns transformation matrix
 	@property
-	def get_transformation_matrix(self):
+	def transformation_matrix(self):
 		return self.W
 
 	#returns variance vector
 	@property
-	def get_variance(self):
+	def variance(self):
 		return self.sigma
 
 	#return covariance matrix of trajectories in non-transformed space
 	@property
-	def get_covariance(self):
+	def covariance(self):
 			return self.C
 
 # Clusters a matrix of observations with a specified clustering algorithm.

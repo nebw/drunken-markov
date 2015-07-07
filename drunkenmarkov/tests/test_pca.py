@@ -21,8 +21,8 @@ if sys.version_info < (3, 0):
     from pyemma.coordinates import pca as emma_pca
 
 @onlypython2
-class PCATests(TestCase):
-	def test_PCA(self):
+class pcaTests(TestCase):
+	def test_pca(self):
 		"""
 		Testing the implemented PCA class against the pyemma result
 		Create deterministic data in [1,1] direction with noise in perpendiculate [1,-1] direction and apply pca
@@ -32,7 +32,7 @@ class PCATests(TestCase):
 		for i in range(0,1000):
 			data[i,:] = [i,i]
 			data[i,:] += [rand[i],-rand[i]]
-		pca = drunkenmarkov.PCA(data)
+		pca = drunkenmarkov.pca(data)
 		emmapca = emma_pca(data)
-		self.assertTrue(np.allclose(pca.get_reduced_data(L = 2),emmapca.get_output()))
-		self.assertTrue(np.allclose(pca.get_covariance, emmapca.covariance_matrix))
+		self.assertTrue(np.allclose(pca.reduced_data(L = 2),emmapca.get_output()))
+		self.assertTrue(np.allclose(pca.covariance, emmapca.covariance_matrix))
