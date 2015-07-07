@@ -80,10 +80,10 @@ class MarkovStateModel:
             if not self.is_connected:
                 raise ValueError("T is not irreducible")
             else:
-                eigenvalues, eigenvectors = np.linalg.eig(np.transpose(self.T))
+                left_eigenvalues, left_eigenvectors = np.linalg.eig(np.transpose(self.T))
                 # Stationary distribution ist the eigenvector to the eigenvalue 1
-                self._stat_dist = eigenvectors[:,np.where(np.isclose(eigenvalues, 1.))].reshape(self.T.shape[0])
-                #Normalize stationary distribution s.t. the sum over all entries yields 1
+                self._stat_dist = left_eigenvectors[:,np.where(np.isclose(left_eigenvalues, 1.))].reshape(self.T.shape[0])
+                # Normalize stationary distribution s.t. the sum over all entries yields 1
                 self._stat_dist = np.absolute(self._stat_dist / np.linalg.norm(self._stat_dist,1))
         return self._stat_dist
 
@@ -141,7 +141,7 @@ class MarkovStateModel:
             re_eigenv = np.real(self.eigenv)
             # continue with real part only
             self._timescales = np.zeros_like(re_eigenv)
-            #find index corresponding to stationary distributio
+            #find index corresponding to stationary distribution
             problematic_index = np.where(np.isclose(re_eigenv, 1., rtol=1e-20))
             #replace problematic value with one that behaves well
             re_eigenv[problematic_index] = 20.
