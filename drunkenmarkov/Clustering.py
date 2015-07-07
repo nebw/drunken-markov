@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import numpy as np
+from scipy.linalg import eigh
 
 # Object that is returned by the clustering algorithms.
 # It can be used as a mapping from sample index to cluster or to retrieve general informations about the clusters.
@@ -110,7 +111,7 @@ class pca:
 
 	#return projection of the data on the first L pricipal axis or specify L by a cutoff of the cummulative variance
 	#if neither is given return full projection on eigenspace of the covariance matrix
-	def reduced_data(self, cutoff = 1, L = None):
+	def reduced_data(self, cutoff = 1., L = None):
 		if L is not None:
 			return self.Y[:,0:L]
 		return self.Y[:,np.where(self.s <= cutoff)[0]]
@@ -134,6 +135,71 @@ class pca:
 	@property
 	def covariance(self):
 			return self.C
+
+#Performs tica on an array of data
+#note that this does not support a list of trajectories(yet)
+class tica:
+	def __init__(self, data, lag = 10):
+		if not isinstance(data, np.ndarray):
+			raise TypeError("Data must be numpy array")
+		#reject one dimensional data
+		self.dim = data.shape[1]
+		if self.dim ==  1:
+			raise TypeError("Data is already one dimensional")
+		self.tau = lag
+		self.mean = data.mean(axis = 0)
+		#first of all the data has to be mean free, so we simply subtract the mean
+		self.X = data - self.mean
+		#calculate the covariance matrix
+		self.C0 = np.dot(np.transpose(self.X),self.X)
+		#enforce symmetrie
+		self.C0 = np.add(self.C0, np.transpose(self.C0)) /( 2 * (self.X.shape[0] - 1))
+		#calculate the correlattion matrix. N-1 due to Bessels correction.
+		self.C = np.dot(np.transpose(self.X[self.tau:, :]),self.X[: -self.tau,:])
+		#enforce symmetrie
+		self.C = np.add(self.C, np.transpose(self.C) ) / (2 * (self.X.shape[0] - 1 - self.tau))
+		#solve the generalized eigenvalue problem: C Psi = sigma C0 Psi
+		self.sigma, self.psi = eigh(self.C, b = self.C0, type = 1)
+		#sort eigenvalue and -vectors descending
+		idx = np.argsort(np.absolute(self.sigma))
+		self.sigma = self.sigma[idx[::-1]]
+		self.psi = self.psi[:,idx[::-1]]
+		#calculate the transformed data
+		self.Y = np.dot(self.X, self.psi)
+		#calculate the cummulative autocorrelation
+		self.s = np.cumsum(self.sigma) / np.sum(self.sigma)
+
+	#Either specify new dimension by a cutoff cummulative variance or the desired dimension.
+	def reduced_data(self, cutoff = 1., L = None):
+		if L is not None:
+			return self.Y[:,0:L]
+		if cutoff == 1.:
+			return self.Y
+		return self.Y[:,np.where(self.s <= cutoff)[0]]
+
+	@property
+	def mean(self):
+		return self.mean
+
+	@property
+	def cummulative_autocorrelation(self):
+		return self.s
+
+	@property
+	def transformation_matrix(self):
+		return self.psi
+
+	@property
+	def autocorrelation(self):
+		return self.sigma
+
+	@property
+	def cross_correlation(self):
+		return self.C
+
+	@property
+	def covariance(self):
+		return self.C0
 
 # Clusters a matrix of observations with a specified clustering algorithm.
 # returns a Clusters object.
