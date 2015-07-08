@@ -202,3 +202,23 @@ def draw_graph_dominant(msm, with_comm_classes=False):
     g.layout(prog='dot')
     data = g.draw(format='png')
     return Image.open(BytesIO(data))
+
+def draw_pcca_memberships(original_data, pcca, discrete_trajectory, colormap_name="jet"):
+    """
+    Visualize the result of PCCA+ as colored plot of the PCA. 
+    """
+    pca = PCA(original_data)
+
+    cluster_ids = range(0, pcca.shape[1])
+    colormap = matplotlib.cm.get_cmap(colormap_name, len(cluster_ids) + 1)
+
+    membership = pcca > 0.5
+    pcca_traj = np.where(membership[discrete_trajectory])[1]
+
+
+    for index, cluster in enumerate(cluster_ids):
+        datapoints = original_data[np.where(pcca_traj == cluster)]
+        print('points in cluster ', cluster, ': ', len(datapoints))
+        datapoints_transformed = pca.project(datapoints)
+        plt.scatter(datapoints_transformed[:,0], datapoints_transformed[:,1], color=colormap(index), alpha=0.5)
+    plt.title('pcca')
