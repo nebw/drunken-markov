@@ -112,6 +112,45 @@ def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
         plt.show()
 
 
+def draw_spectrum(T)
+    """
+    Draw the biggest eigenvalues of the transition matrix for visualizing the
+    spectral gap and showing the relation to the timescales of the Markov Chain.
+    """      
+    # eigenvalues of T sorted by the size
+    W, _ = np.linalg.eig(T)
+    V = W[::-1]
+    x=[1,2,3]
+    t = arange(1.0,4.0,1.0)
+
+    # Define limits of the graph
+    xmin = 0.9
+    xmax = 3.1
+    ymin = -0.1
+    ymax = 1.1
+
+    # Plot the three biggest eigenvalues:
+    ax1 = subplot(111)
+    plot(x,V, 'yo')
+    plt.vlines(t,0,V)
+    plt.axhline(linewidth=1, color='k')
+    plt.axhline(y=1, linewidth=1, color='r')
+    plt.xlabel('Index i', fontsize=12)
+    plt.ylabel(r'Eigenvalue $\lambda_i$', fontsize=12)
+    ax1.xaxis.tick_bottom()
+    ax1.yaxis.tick_left()
+    plt.axis([xmin, xmax, ymin, ymax])
+
+    # timescales on the right y-axis:
+    ax2 = twinx()
+    plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
+    ax2.yaxis.tick_right()
+
+    plt.title('Eigenvalues', fontsize=16)
+    plt.show()  
+
+
+
 def draw_free_energy(centers, pi, T=300, output_file=None):
     """
     Draw the free energy difference landscape at given temperature T
