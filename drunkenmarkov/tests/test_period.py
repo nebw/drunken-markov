@@ -7,7 +7,7 @@ from unittest import TestCase
 from drunkenmarkov.Analysis import MarkovStateModel
 
 
-class StationaryTests(TestCase):
+class PeriodTests(TestCase):
     def test_period(self):
         """
         Tests if the implemented period computation method
