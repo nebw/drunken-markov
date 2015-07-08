@@ -112,7 +112,7 @@ def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
         plt.show()
 
 
-def draw_spectrum(T)
+def draw_spectrum(T):
     """
     Draw the biggest eigenvalues of the transition matrix for visualizing the
     spectral gap and showing the relation to the timescales of the Markov Chain.
