@@ -46,3 +46,19 @@ class StationaryTests(TestCase):
         self.assertTrue(markovmodel_1.is_reversible)
         self.assertTrue(markovmodel_2.is_reversible)
         self.assertFalse(markovmodel_3.is_reversible)
+
+class RandomMatrixTest(TestCase):
+    def Random_Matrix_Test(self):
+        """
+        Generate random reversible transition matrices and test if the stationary distribution is correct.
+        """
+        for i in range(10):
+            R = np.random.rand(100,100)
+            R = np.add(R.T, R)
+            R /= np.sum(R)
+            stat_dist = np.sum(R, axis = 1)
+            T = R / stat_dist
+            T = T.T
+            msm = MarkovStateModel(T)
+            self.assertTrue(msm.is_reversible)
+            self.assertTrue(np.allclose(msm.stationary_distribution,stat_dist))

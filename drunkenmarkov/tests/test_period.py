@@ -5,6 +5,7 @@ import numpy as np
 from unittest import TestCase
 
 from drunkenmarkov.Analysis import MarkovStateModel
+from drunkenmarkov.Util import gcd
 
 
 class PeriodTests(TestCase):
@@ -32,3 +33,8 @@ class PeriodTests(TestCase):
         self.assertEqual(1.0,p_1)
         self.assertEqual(2.0,p_2)
         self.assertEqual(2.0,p_3)
+
+        # test if the greatest common divisor function works:
+        self.assertEqual(gcd(2,-1),1)
+        self.assertEqual(gcd(1,0),1)
+        self.assertEqual(gcd(10,15),5)
