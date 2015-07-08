@@ -143,7 +143,7 @@ def draw_spectrum(T)
 
     # timescales on the right y-axis:
     ax2 = twinx()
-    plt.ylabel('timescale', fontsize=12)
+    plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
     ax2.yaxis.tick_right()
 
     plt.title('Eigenvalues', fontsize=16)
