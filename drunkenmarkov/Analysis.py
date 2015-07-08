@@ -118,12 +118,12 @@ class MarkovStateModel:
                             v[j] = v[i] + 1
                     j = j+1
                 m = len(D)
-            return d
+            
             if d == 1:
                 print ("This Markov chain is aperiodic and converges to its stationary distribution")
             else:
                 print ("This Markov chain is periodic with period" % d)
-
+            return d
 
     @property
     def timescales(self):
@@ -168,7 +168,7 @@ class MarkovStateModel:
         from pyemma.msm.analysis import pcca as pyemma_pcca
         return pyemma_pcca(self.T, m)
 
-    def reduce_matrix(self, m_pcca, min_pcca_memb_prob):
+    def reduce_matrix(self, m_pcca, min_pcca_memb_prob=0.5):
         """
         Reduce the transition matrix to the metastable states found by pcca+.
         T_{reduced} = \sum_{i,j} T_{i,j} P(i) / (\sum_i P(i) )
