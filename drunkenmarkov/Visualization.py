@@ -161,7 +161,7 @@ def draw_clusters(clusters, plotter=None, colormap_name="jet"):
 def get_graph2(msm, with_comm_classes=False):
     """Draw a graph representation of the chain using pygraphviz. For dominant pathway"""
 
-    g = AGraph(strict=False, directed=True)
+    g = AGraph(strict=False, directed=True, name='Eff. prob. current, dominant pathway')
 
     g.graph_attr.update(size="7.75, 10.25")
     g.graph_attr.update(dpi="300")
@@ -186,11 +186,12 @@ def get_graph2(msm, with_comm_classes=False):
 
     for from_node in range(msm.num_nodes):
         for to_node in get_adjacent_nodes(msm, from_node, discard_self=False):
-            label = '%.6f' % msm.effective_probability_current[from_node, to_node]
-            if([from_node, to_node] in msm.dominant_pathway_format):
-                g.add_edge(from_node, to_node, color='red' , label=label)                    
-            else:
-            	g.add_edge(from_node, to_node, label=label)
+            if msm.effective_probability_current[from_node, to_node] != 0.0:
+                label = '%.2E' % msm.effective_probability_current[from_node, to_node]
+                if([from_node, to_node] in msm.dominant_pathway_format):
+                    g.add_edge(from_node, to_node, color='red' , label=label)                    
+                else:
+                	g.add_edge(from_node, to_node, label=label)
 
     return g
 
