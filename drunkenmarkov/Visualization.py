@@ -113,16 +113,18 @@ def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
         plt.show()
 
 
-def draw_spectrum(T):
+def draw_spectrum(msm):
     """
     Draw the biggest eigenvalues of the transition matrix for visualizing the
     spectral gap and showing the relation to the timescales of the Markov Chain.
     """      
     # eigenvalues of T sorted by the size
-    W, _ = np.linalg.eig(T)
+    W = msm.eigenv
+    #W, _ = np.linalg.eig(T)
     length = min(len(W), 10) 
     a = sorted(W, reverse=True, key=lambda x: abs(x))[0:length]
-    x = np.arange(1.0,11.0,1.0)
+    time = msm.timescales[0:length]
+    x = np.arange(1.0,11.0,1.0)[0:length]
 
     # Define limits of the graph
     xmin = 0.7
@@ -144,6 +146,9 @@ def draw_spectrum(T):
 
     # timescales on the right y-axis:
     ax2 = plt.twinx()
+    ax2.set_ylim([ymin, ymax])
+    ax2.set_yticks(a)
+    ax2.set_yticklabels(["{0:0.2}".format(timescale) for timescale in msm.timescales])
     plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
     ax2.yaxis.tick_right()
 
