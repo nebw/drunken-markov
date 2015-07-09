@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.mlab import PCA
 import matplotlib.cm
 
-def get_graph(msm, with_comm_classes=False):
+def get_graph(msm, with_comm_classes=False, edge_threshold=0.):
     """Draw a graph representation of the chain using pygraphviz."""
 
     g = AGraph(strict=False, directed=True)
@@ -33,14 +33,15 @@ def get_graph(msm, with_comm_classes=False):
 
     for from_node in range(msm.num_nodes):
         for to_node in get_adjacent_nodes(msm, from_node, discard_self=False):
-            label = '%.2f' % msm.T[from_node, to_node]
-            g.add_edge(from_node, to_node, label=label)
+            if msm.T[from_node, to_node] > edge_threshold:
+                label = '%.2f' % msm.T[from_node, to_node]
+                g.add_edge(from_node, to_node, label=label)
 
     return g
 
 
-def draw_graph(msm, with_comm_classes=False):
-    g = get_graph(msm, with_comm_classes)
+def draw_graph(msm, with_comm_classes=False, edge_threshold=0.):
+    g = get_graph(msm, with_comm_classes, edge_threshold)
 
     g.layout(prog='dot')
     data = g.draw(format='png')
@@ -138,11 +139,11 @@ def draw_clusters(clusters, plotter=None, colormap_name="jet"):
     Visualize clustered data and cluster membership in a new plot or with an existing axis object.
     """
     plotter = plotter or plt
-    
+
     # use PCA to be able to visualize the data in two dimensions
     all_data = clusters.getOriginalData()
     pca = PCA(all_data)
-    
+
     # for nicer visualization
     data_length = len(all_data)
     alpha = 1.0 / (math.sqrt(data_length))
