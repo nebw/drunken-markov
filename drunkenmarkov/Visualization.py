@@ -131,9 +131,9 @@ def draw_spectrum(T):
     ymax = 1.1
 
     # Plot the ten biggest eigenvalues:
-    ax1 = subplot(111)
-    plot(x,a[0], 'yo')
-    plt.vlines(t,0,a[0])
+    ax1 = plt.subplot(111)
+    plt.plot(x,a[0], 'yo')
+    plt.vlines(x,0,a[0])
     plt.axhline(linewidth=1, color='k')
     plt.axhline(y=1, linewidth=1, color='r')
     plt.xlabel('Index i', fontsize=12)
@@ -143,7 +143,7 @@ def draw_spectrum(T):
     plt.axis([xmin, xmax, ymin, ymax])
 
     # timescales on the right y-axis:
-    ax2 = twinx()
+    ax2 = plt.twinx()
     plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
     ax2.yaxis.tick_right()
 
