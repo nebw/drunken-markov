@@ -21,6 +21,9 @@ def depth_first_search(msm, node, node_list, visited_nodes=None):
         node_list.append(node)
 
 def gcd(a,b):
+    """
+    Compute the greatest common divisor of two natural numbers a,b
+    """
     m = np.minimum(np.absolute(a),np.absolute(b))
     M = np.maximum(np.absolute(a),np.absolute(b))
     if m == 0:

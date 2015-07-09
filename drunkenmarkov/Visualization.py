@@ -113,6 +113,46 @@ def draw_stationary(centers, pi, plot_pi_orig=True, output_file=None):
         plt.show()
 
 
+def draw_spectrum(T):
+    """
+    Draw the biggest eigenvalues of the transition matrix for visualizing the
+    spectral gap and showing the relation to the timescales of the Markov Chain.
+    """      
+    # eigenvalues of T sorted by the size
+    W, _ = np.linalg.eig(T)
+    V = W[::-1]
+    a = np.zeros((1,10))
+    np.put(a, np.arange(V.size), V)
+    x = np.arange(1.0,11.0,1.0)
+
+    # Define limits of the graph
+    xmin = 0.7
+    xmax = 10.1
+    ymin = -0.1
+    ymax = 1.1
+
+    # Plot the ten biggest eigenvalues:
+    ax1 = plt.subplot(111)
+    plt.plot(x,a[0], 'yo')
+    plt.vlines(x,0,a[0])
+    plt.axhline(linewidth=1, color='k')
+    plt.axhline(y=1, linewidth=1, color='r')
+    plt.xlabel('Index i', fontsize=12)
+    plt.ylabel(r'Eigenvalue $\lambda_i$', fontsize=12)
+    ax1.xaxis.tick_bottom()
+    ax1.yaxis.tick_left()
+    plt.axis([xmin, xmax, ymin, ymax])
+
+    # timescales on the right y-axis:
+    ax2 = plt.twinx()
+    plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
+    ax2.yaxis.tick_right()
+
+    plt.title('Eigenvalues', fontsize=16)
+    plt.show()  
+
+
+
 def draw_free_energy(centers, pi, T=300, output_file=None):
     """
     Draw the free energy difference landscape at given temperature T
@@ -155,3 +195,71 @@ def draw_clusters(clusters, plotter=None, colormap_name="jet"):
         datapoints = all_data[clusters._map == cluster,:]
         datapoints_transformed = pca.project(datapoints)
         plotter.scatter(datapoints_transformed[:,0], datapoints_transformed[:,1], color=colormap(index), alpha=0.5)
+        
+        
+        
+        
+def get_graph2(msm, with_comm_classes=False):
+    """Draw a graph representation of the chain using pygraphviz. For dominant pathway"""
+
+    g = AGraph(strict=False, directed=True, name='Eff. prob. current, dominant pathway')
+
+    g.graph_attr.update(size="7.75, 10.25")
+    g.graph_attr.update(dpi="300")
+    for i in range(msm.num_nodes):
+        if(i in msm.a):	
+            g.add_node(i, color = 'blue')
+        elif(i in msm.b):
+            g.add_node(i, color = 'green')
+        elif(i in msm.dominant_pathway):
+            g.add_node(i, color= 'red')
+        else:
+            g.add_node(i)
+
+    if with_comm_classes:
+        comm_classes = msm.communication_classes
+
+        for (i, comm) in enumerate(comm_classes):
+            g.add_subgraph(nbunch=comm, name='cluster%d' % i,
+                           style='rounded, dotted',
+                           color='lightgrey',
+                           label='<<B>Communication class %d</B>>' % (i + 1))
+
+    for from_node in range(msm.num_nodes):
+        for to_node in get_adjacent_nodes(msm, from_node, discard_self=False):
+            if msm.effective_probability_current[from_node, to_node] != 0.0:
+                label = '%.2E' % msm.effective_probability_current[from_node, to_node]
+                if([from_node, to_node] in msm.dominant_pathway_format):
+                    g.add_edge(from_node, to_node, color='red' , label=label)                    
+                else:
+                	g.add_edge(from_node, to_node, label=label)
+
+    return g
+
+
+def draw_graph_dominant(msm, with_comm_classes=False):
+    g = get_graph2(msm, with_comm_classes)
+
+    g.layout(prog='dot')
+    data = g.draw(format='png')
+    return Image.open(BytesIO(data))
+
+def draw_pcca_memberships(original_data, pcca, discrete_trajectory, colormap_name="jet"):
+    """
+    Visualize the result of PCCA+ as colored plot of the PCA. 
+    """
+    pca = PCA(original_data)
+
+    cluster_ids = range(0, pcca.shape[1])
+    colormap = matplotlib.cm.get_cmap(colormap_name, len(cluster_ids) + 1)
+
+    membership = pcca > 0.5
+    pcca_traj = np.where(membership[discrete_trajectory])[1]
+
+
+    for index, cluster in enumerate(cluster_ids):
+        datapoints = original_data[np.where(pcca_traj == cluster)]
+        print('points in cluster ', cluster, ': ', len(datapoints))
+        datapoints_transformed = pca.project(datapoints)
+        plt.scatter(datapoints_transformed[:,0], datapoints_transformed[:,1], color=colormap(index), alpha=0.5)
+    plt.title('pcca')
