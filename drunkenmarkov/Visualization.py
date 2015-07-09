@@ -117,10 +117,10 @@ def draw_spectrum(T):
     """
     Draw the biggest eigenvalues of the transition matrix for visualizing the
     spectral gap and showing the relation to the timescales of the Markov Chain.
-    """      
+    """
     # eigenvalues of T sorted by the size
     W, _ = np.linalg.eig(T)
-    length = min(len(W), 10) 
+    length = min(len(W), 10)
     a = sorted(W, reverse=True, key=lambda x: abs(x))[0:length]
     x = np.arange(1.0,11.0,1.0)
 
@@ -148,7 +148,7 @@ def draw_spectrum(T):
     ax2.yaxis.tick_right()
 
     plt.title('Eigenvalues', fontsize=16)
-    plt.show()  
+    plt.show()
 
 
 
@@ -194,19 +194,19 @@ def draw_clusters(clusters, plotter=None, colormap_name="jet"):
         datapoints = all_data[clusters._map == cluster,:]
         datapoints_transformed = pca.project(datapoints)
         plotter.scatter(datapoints_transformed[:,0], datapoints_transformed[:,1], color=colormap(index), alpha=0.5)
-        
-        
-        
-        
-def get_graph2(msm, with_comm_classes=False):
+
+
+
+
+def get_dominant_graph(msm, with_comm_classes=False):
     """Draw a graph representation of the chain using pygraphviz. For dominant pathway"""
 
-    g = AGraph(strict=False, directed=True, name='Eff. prob. current, dominant pathway')
+    g = AGraph(strict=False, directed=True)
 
     g.graph_attr.update(size="7.75, 10.25")
     g.graph_attr.update(dpi="300")
     for i in range(msm.num_nodes):
-        if(i in msm.a):	
+        if(i in msm.a):
             g.add_node(i, color = 'blue')
         elif(i in msm.b):
             g.add_node(i, color = 'green')
@@ -229,7 +229,7 @@ def get_graph2(msm, with_comm_classes=False):
             if msm.effective_probability_current[from_node, to_node] != 0.0:
                 label = '%.2E' % msm.effective_probability_current[from_node, to_node]
                 if([from_node, to_node] in msm.dominant_pathway_format):
-                    g.add_edge(from_node, to_node, color='red' , label=label)                    
+                    g.add_edge(from_node, to_node, color='red' , label=label)
                 else:
                 	g.add_edge(from_node, to_node, label=label)
 
@@ -237,7 +237,7 @@ def get_graph2(msm, with_comm_classes=False):
 
 
 def draw_graph_dominant(msm, with_comm_classes=False):
-    g = get_graph2(msm, with_comm_classes)
+    g = get_dominant_graph(msm, with_comm_classes)
 
     g.layout(prog='dot')
     data = g.draw(format='png')
@@ -245,7 +245,7 @@ def draw_graph_dominant(msm, with_comm_classes=False):
 
 def draw_pcca_memberships(original_data, pcca, discrete_trajectory, colormap_name="jet"):
     """
-    Visualize the result of PCCA+ as colored plot of the PCA. 
+    Visualize the result of PCCA+ as colored plot of the PCA.
     """
     pca = PCA(original_data)
 
