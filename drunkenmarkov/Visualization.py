@@ -120,9 +120,8 @@ def draw_spectrum(T):
     """      
     # eigenvalues of T sorted by the size
     W, _ = np.linalg.eig(T)
-    V = W[::-1]
-    a = np.zeros((1,10))
-    np.put(a, np.arange(V.size), V)
+    length = min(len(W), 10) 
+    a = sorted(W, reverse=True, key=lambda x: abs(x))[0:length]
     x = np.arange(1.0,11.0,1.0)
 
     # Define limits of the graph
@@ -133,8 +132,8 @@ def draw_spectrum(T):
 
     # Plot the ten biggest eigenvalues:
     ax1 = plt.subplot(111)
-    plt.plot(x,a[0], 'yo')
-    plt.vlines(x,0,a[0])
+    plt.plot(x,a, 'yo')
+    plt.vlines(x,0,a)
     plt.axhline(linewidth=1, color='k')
     plt.axhline(y=1, linewidth=1, color='r')
     plt.xlabel('Index i', fontsize=12)
