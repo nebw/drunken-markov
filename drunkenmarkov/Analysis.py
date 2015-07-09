@@ -205,6 +205,12 @@ class TransitionPathTheory:
         if not isinstance(a, list) or not isinstance(b, list):
             raise TypeError("a and b must be lists")
 
+        if  max(a) > T.shape[0] or max(b) > T.shape[0]:
+            raise ValueError("sets contain elements that don't exist")
+
+        if min(a) < 0 or min(b) < 0:
+            raise ValueError("sets contain elements that don't exist")
+
         if len(set(a) - set(b)) != len(a):
             raise ValueError("sets a and b must be disjunct")
 
