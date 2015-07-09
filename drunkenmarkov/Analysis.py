@@ -117,7 +117,7 @@ class MarkovStateModel:
                             v[j] = v[i] + 1
                     j = j+1
                 m = len(D)
-            
+
             if d == 1:
                 print ("This Markov chain is aperiodic and converges to its stationary distribution")
             else:
@@ -159,11 +159,11 @@ class MarkovStateModel:
         if self._communication_classes is None:
             self._communication_classes = calculate_communication_classes(self.T)
         return self._communication_classes
-            
+
     def pcca(self, m):
         """Use the pyemma pcca routine to calculate the matrix of membership probabilities
         for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
-        """            
+        """
         from pyemma.msm.analysis import pcca_memberships as pyemma_pcca
         return pyemma_pcca(self.T, m)
 
@@ -181,7 +181,7 @@ class MarkovStateModel:
         for n in range(membership.shape[1]):
             for m in range(membership.shape[1]):
                 # find all origin and destination states belonging to one pcca set (n,m)
-                indx_n = np.where(membership[:, n]) 
+                indx_n = np.where(membership[:, n])
                 indx_m = np.where(membership[:, m])
                 nominator = 0.
                 denumerator = 0.
@@ -193,8 +193,8 @@ class MarkovStateModel:
 
                 T_reduced[n, m] = nominator/denumerator
 
-        return T_reduced
-            
+        return (T_reduced, membership, pc)
+
 
 class TransitionPathTheory:
     def __init__(self, T, a, b):
@@ -288,7 +288,7 @@ class TransitionPathTheory:
         """
         if self._probability_current is None:
             self._probability_current = np.zeros_like(self.T)
-            diagonal_zeros = -np.eye(self.T.shape[0])+ 1 
+            diagonal_zeros = -np.eye(self.T.shape[0])+ 1
             MSM = MarkovStateModel(self.T)
             self._probability_current = np.kron(MSM.stationary_distribution * self.bcom, self.fcom).reshape(self.T.shape) * self.T * diagonal_zeros
         return self._probability_current
@@ -348,7 +348,7 @@ class TransitionPathTheory:
             pathnumber = range(len(paths))
             self._dominant_pathway = paths[dominant_pathway(current, pathnumber)]
         return self._dominant_pathway
-        
+
 # Dominant pathways are still missing. Test functions. We would need a fitting matrix for that.
     @property
     def num_nodes(self):
@@ -362,35 +362,35 @@ class TransitionPathTheory:
         """
         Makes dominant pathway to stepwise list
         """
-        paths_format = [] 
+        paths_format = []
         dominant = self.dominant_pathway
         for i in range(len(dominant)-1):
-            paths_format.append([dominant[i],dominant[i+1]])        
+            paths_format.append([dominant[i],dominant[i+1]])
         return paths_format
 
 
-def find_paths(G, start, target): 
+def find_paths(G, start, target):
     """
     find all paths starting in list start ending in list target with direct matrix graph G initiate list of all paths
     """
     paths = []
     for a in start:
         paths.append([a])
-    
-    
+
+
     paths = expand(paths, G, target)
-    
-    
+
+
     return paths
 
-def expand(paths, G, target): 
+def expand(paths, G, target):
     """
     expand all paths in paths in all directions possible of G end in target
     """
     flag = True
     temp_paths = paths[:]
     for path in temp_paths:
-        if path[-1] not in target and (G[path[-1]]).all == 0:#if it is not in target and there is an dead end 
+        if path[-1] not in target and (G[path[-1]]).all == 0:#if it is not in target and there is an dead end
             paths.remove(path)   #delete this path
         elif path[-1] not in target and not (G[path[-1]]).all == 0: #if it is not in target and not a dead end
             flag = False		#propagate one step in all possible directions
@@ -406,12 +406,12 @@ def expand(paths, G, target):
             flag = True
     if not flag: 		#if it was propagated start expand again
         paths = expand(paths, G, target)
-                
-            
-    
+
+
+
     return paths		#if all dead ends are deleted and any path in target
-    
-def get_current_of_paths(paths, G): 
+
+def get_current_of_paths(paths, G):
     """
     calculate out of all paths the effective current of all paths
     """
@@ -420,11 +420,11 @@ def get_current_of_paths(paths, G):
         temp_list=[]
         for j in range(len(paths[i])-1):
             temp_list.append(G[paths[i][j]][paths[i][j+1]])
-        
+
         effec_current_path.append(temp_list)
-    
+
     return effec_current_path
-    
+
 def dominant_pathway(effec, pathnumber):
     mins = np.zeros(len(pathnumber))
     for i in range(len(pathnumber)):
@@ -444,9 +444,9 @@ def dominant_pathway(effec, pathnumber):
 def calculate_communication_classes(matrix):
     """Linear time algorithm to find the strongly connected components of
     a directed graph.
-    
+
     Takes either a transition matrix or a count matrix.
-    
+
     Pseudocode: http://en.wikipedia.org/wiki/Kosaraju%27s_algorithm#The_algorithm
     """
 
@@ -495,7 +495,7 @@ def get_connected_count_matrix(count_matrix):
     if len(communication_classes) <= 1:
         return count_matrix
     communication_classes = sorted(communication_classes, key=lambda x: len(x), reverse=True)
-    
+
     import numpy as np
     row_column_indices = sorted(np.array(communication_classes[0]))
     matrix = np.array(count_matrix)[row_column_indices, :][:, row_column_indices]
