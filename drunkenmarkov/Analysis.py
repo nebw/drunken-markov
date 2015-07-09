@@ -24,7 +24,6 @@ class MarkovStateModel:
         self._stat_dist = None
         # also compute the communication classes lazily
         self._communication_classes = None
-        self._T_reduced = None
 
     @property
     def is_transition_matrix(self):
@@ -165,7 +164,7 @@ class MarkovStateModel:
         """Use the pyemma pcca routine to calculate the matrix of membership probabilities
         for a detailed description of the function see http://pythonhosted.org/pyEMMA/api/generated/pyemma.msm.analysis.pcca.html
         """            
-        from pyemma.msm.analysis import pcca as pyemma_pcca
+        from pyemma.msm.analysis import pcca_memberships as pyemma_pcca
         return pyemma_pcca(self.T, m)
 
     def reduce_matrix(self, m_pcca, min_pcca_memb_prob=0.5):
@@ -173,30 +172,28 @@ class MarkovStateModel:
         Reduce the transition matrix to the metastable states found by pcca+.
         T_{reduced} = \sum_{i,j} T_{i,j} P(i) / (\sum_i P(i) )
         """
+        pc = self.pcca(m_pcca)
+        membership = pc > min_pcca_memb_prob
 
-        if self._T_reduced is None:
-            pc = self.pcca(m_pcca)
-            membership = pc > min_pcca_memb_prob
+        T_reduced = np.zeros((membership.shape[1], membership.shape[1]))
 
-            self._T_reduced = np.zeros((membership.shape[1], membership.shape[1]))
+        # iterate over all states of reduced matrix
+        for n in range(membership.shape[1]):
+            for m in range(membership.shape[1]):
+                # find all origin and destination states belonging to one pcca set (n,m)
+                indx_n = np.where(membership[:, n]) 
+                indx_m = np.where(membership[:, m])
+                nominator = 0.
+                denumerator = 0.
+                # sum like stated in docstring
+                for l in indx_n[0]:
+                    denumerator += self.stationary_distribution[l]
+                    for k in indx_m[0]:
+                        nominator += self.T[l, k] * self.stationary_distribution[l]
 
-            # iterate over all states of reduced matrix
-            for n in range(membership.shape[1]):
-                for m in range(membership.shape[1]):
-                    # find all origin and destination states belonging to one pcca set (n,m)
-                    indx_n = np.where(membership[:, n]) 
-                    indx_m = np.where(membership[:, m])
-                    nominator = 0.
-                    denumerator = 0.
-                    # sum like stated in docstring
-                    for l in indx_n[0]:
-                        denumerator += self.stationary_distribution[l]
-                        for k in indx_m[0]:
-                            nominator += self.T[l, k] * self.stationary_distribution[l]
+                T_reduced[n, m] = nominator/denumerator
 
-                    self._T_reduced[n, m] = nominator/denumerator
-    
-        return self._T_reduced
+        return T_reduced
             
 
 class TransitionPathTheory:
