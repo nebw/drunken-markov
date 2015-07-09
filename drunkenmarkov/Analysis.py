@@ -92,7 +92,8 @@ class MarkovStateModel:
         """
         Compute the period of a Markov Chain with transition matrix T
         (since only irreducible Markov Chains are considered all states have the same period,
-        in particular the Markov Chain is either periodic or aperiodic)
+        in particular the Markov Chain is either periodic or aperiodic).
+        Algorithm from http://www.jstor.org/stable/3689120.
         """
         if not self.is_connected:
             raise ValueError("T is not irreducible")
