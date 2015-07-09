@@ -3,6 +3,7 @@
 import numpy as np
 from unittest import TestCase
 from drunkenmarkov.Analysis import MarkovStateModel
+from drunkenmarkov.Estimation import estimate_reversible
 import sys
 
 def onlypython2(fun):
@@ -19,6 +20,7 @@ def onlypython2(fun):
     else:
         return fun
 
+
 @onlypython2
 class ReduceMatrixTests(TestCase):
     def test_ReduceMatrixRowsum(self):
@@ -27,6 +29,20 @@ class ReduceMatrixTests(TestCase):
         """
 
         T = np.array([[0.9, 0.1, 0.0], [0.5, 0.0, 0.5], [0.0, 0.1, 0.9]])
+
+        MSM = MarkovStateModel(T)
+        T_reduced = MSM.reduce_matrix(2)[0]
+
+        self.assertTrue(np.allclose(T_reduced.sum(axis=1), 1., rtol=1.e-5))
+
+    def test_RandomRowsum(self):
+        """
+        Tests if the rowsum of a reduced matrix is one. Uses random 10x10
+        test matrix.
+        """
+
+        C = np.random.randint(1000, size=(10, 10))
+        T = estimate_reversible(C)
 
         MSM = MarkovStateModel(T)
         T_reduced = MSM.reduce_matrix(2)[0]
