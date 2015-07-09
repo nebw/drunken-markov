@@ -119,39 +119,48 @@ def draw_spectrum(msm):
     spectral gap and showing the relation to the timescales of the Markov Chain.
     """
     # eigenvalues of T sorted by the size
-    W = msm.eigenv
-    length = min(len(W), 10) 
-    a = sorted(W, reverse=True, key=lambda x: abs(x))[0:length]
+    length = min(len(msm.eigenv), 10) 
+    a = msm.eigenv[0:length]
+    #a = sorted(W, reverse=True, key=lambda x: abs(x))[0:length]
     time = msm.timescales[0:length]
     x = np.arange(1.0,11.0,1.0)[0:length]
 
     # Define limits of the graph
     xmin = 0.7
-    xmax = 10.1
+    xmax = 10.3
     ymin = -0.1
     ymax = 1.1
 
     # Plot the ten biggest eigenvalues:
     ax1 = plt.subplot(111)
-    plt.plot(x,a, 'yo')
+    plt.plot(x,a, 'ro', alpha=0.7, ms=8)
     plt.vlines(x,0,a)
-    plt.axhline(linewidth=1, color='k')
-    plt.axhline(y=1, linewidth=1, color='r')
     plt.xlabel('Index i', fontsize=12)
-    plt.ylabel(r'Eigenvalue $\lambda_i$', fontsize=12)
+    ax1.set_ylabel(r'Eigenvalue $\lambda_i$', fontsize=12, color='r')
+    for tl in ax1.get_yticklabels(): #set tick label color
+        tl.set_color('r')
     ax1.xaxis.tick_bottom()
     ax1.yaxis.tick_left()
     plt.axis([xmin, xmax, ymin, ymax])
 
-    # timescales on the right y-axis:
+    # add horizontal lines for orientation
+    plt.axhline(linewidth=1, color='k')
+    plt.axhline(y=1, linewidth=1, color='y')
+
+    # plot timescales on the right y-axis:
     ax2 = plt.twinx()
-    ax2.set_ylim([ymin, ymax])
-    ax2.set_yticks(a)
-    ax2.set_yticklabels(["{0:0.2}".format(timescale) for timescale in msm.timescales])
-    plt.ylabel(r'Implied timescale $t_i$', fontsize=12)
+    ax2.plot(x, time, 'bs', alpha=0.6, ms=6)
+    #ax2.set_ylim([ymin, ymax])
+    #ax2.set_yticks(time)
+    #ax2.set_yticklabels(["{0:0.2}".format(timescale) for timescale in time])
+    ax2.set_ylabel(r'Implied timescale $t_i$', fontsize=12, color='b')
+    for tl in ax2.get_yticklabels():
+        tl.set_color('b')
     ax2.yaxis.tick_right()
 
-    plt.title('Eigenvalues', fontsize=16)
+    plt.title('Eigenvalues and Implied Timescales', fontsize=16)
+
+    plt.axis([xmin, xmax, 0., 1.05*time[1]])
     plt.show()
 
 

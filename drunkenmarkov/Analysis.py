@@ -6,7 +6,7 @@ from .Util import get_adjacent_nodes, depth_first_search, gcd
 
 
 class MarkovStateModel:
-    def __init__(self, T, lagtime=1., k=5):
+    def __init__(self, T, lagtime=1., k=10):
         self.T = T
 
         if not isinstance(T, np.ndarray):
